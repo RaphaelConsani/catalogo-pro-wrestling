@@ -19,9 +19,12 @@ const ORDENS = {
   confronto_desc: 'Confronto (Z–A)',
   tipo_asc: 'Tipo (A–Z)',
   tipo_desc: 'Tipo (Z–A)',
+  empresa_asc: 'Empresa (A–Z)',
+  empresa_desc: 'Empresa (Z–A)',
 };
 // Na visão em cards (agrupada por evento) não dá pra ordenar por confronto ou tipo.
-const ORDENS_GRUPOS = ['adicionado', 'evento_desc', 'evento_asc', 'eventonome_asc', 'eventonome_desc'];
+const ORDENS_GRUPOS = ['adicionado', 'evento_desc', 'evento_asc', 'eventonome_asc', 'eventonome_desc', 'empresa_asc', 'empresa_desc'];
+const siglaGrupo = (g) => g.empresa?.sigla || g.empresa?.nome;
 const alfa = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
 // Texto vazio vai sempre pro fim, nas duas direções.
 const porTexto = (f, dir = 1) => (a, b) => {
@@ -31,7 +34,8 @@ const porTexto = (f, dir = 1) => (a, b) => {
   return dir * alfa.compare(x, y);
 };
 // Busca e ordem ficam guardadas durante a sessão.
-const estado = { busca: '', ordem: 'adicionado' };
+// Filtro de empresa: principal + parceiras do evento (igual à Biblioteca).
+const estado = { busca: '', ordem: 'adicionado', filtros: { empresa: '' }, painelAberto: false };
 const cmp = (a, b) => (a ?? '').localeCompare(b ?? '');
 
 async function carregarDados() {
@@ -90,6 +94,9 @@ function ordenarGrupos(grupos) {
     evento_asc: porEvento,
     eventonome_asc: porTexto((g) => g.evento?.nome),
     eventonome_desc: porTexto((g) => g.evento?.nome, -1),
+    // Mesma empresa: evento mais recente primeiro.
+    empresa_asc: (a, b) => porTexto(siglaGrupo)(a, b) || porEvento(b, a),
+    empresa_desc: (a, b) => porTexto(siglaGrupo, -1)(a, b) || porEvento(b, a),
   }[estado.ordem] ?? ((a, b) => cmp(b.adicionadoEm, a.adicionadoEm));
   return [...grupos].sort(comparar);
 }
@@ -107,11 +114,14 @@ function ordenarItens(itens) {
     confronto_desc: porTexto((i) => i.confronto, -1),
     tipo_asc: porTexto((i) => i.nomeTipo),
     tipo_desc: porTexto((i) => i.nomeTipo, -1),
+    empresa_asc: (a, b) => porTexto((i) => siglaGrupo(i.grupo))(a, b) || porEvento(b, a),
+    empresa_desc: (a, b) => porTexto((i) => siglaGrupo(i.grupo), -1)(a, b) || porEvento(b, a),
   }[estado.ordem];
   return [...itens].sort((a, b) => comparar(a, b) || cmp(b.criadoEm, a.criadoEm));
 }
 
 const COLUNAS_BACKLOG = [
+  { rotulo: 'Empresa', ordem: ['empresa_asc', 'empresa_desc'], seta: ['▲', '▼'], classe: 'col-empresa opcional' },
   { rotulo: 'Evento', ordem: ['eventonome_asc', 'eventonome_desc'], seta: ['▲', '▼'], classe: 'col-evento opcional' },
   { rotulo: 'Data', ordem: ['evento_desc', 'evento_asc'], seta: ['▼', '▲'], classe: 'col-data' },
   { rotulo: 'Confronto', ordem: ['confronto_asc', 'confronto_desc'], seta: ['▲', '▼'], classe: 'col-confronto' },
@@ -129,7 +139,8 @@ function htmlLinhaBacklog(item, lutasPorEvento) {
     : `<a class="botao botao-primario botao-pequeno" href="#/backlog/${item.id}/assisti">✓ Assisti</a>
        <button type="button" class="botao-icone" data-acao="editar" aria-label="Editar" title="Editar">✎</button>`;
   return `<tr class="linha-backlog${eventoInteiro ? ' linha-evento-inteiro' : ''}" data-item="${item.id}" style="--cor-empresa:${esc(empresa?.cor ?? '#3a4152')}">
-    <td class="col-evento opcional"><span class="sigla-empresa">${esc(empresa?.sigla || empresa?.nome || '?')}</span> ${esc(evento?.nome ?? 'Evento excluído')}</td>
+    <td class="col-empresa opcional"><span class="sigla-empresa">${esc(empresa?.sigla || empresa?.nome || '?')}</span></td>
+    <td class="col-evento opcional">${esc(evento?.nome ?? 'Evento excluído')}</td>
     <td class="col-data">${evento?.data ? formatarData(evento.data) : '—'}</td>
     <td class="col-confronto">${eventoInteiro
       ? `<strong>Evento inteiro</strong><small>${n ? plural(n, 'luta registrada', 'lutas registradas') : 'nenhuma luta registrada'}</small><span class="so-celular">${esc(evento?.nome ?? '')}</span>`
@@ -190,11 +201,18 @@ export async function telaBacklog(container) {
     </section>
     <div class="barra-ferramentas backlog-barra">
       <input type="search" class="campo-entrada busca" placeholder="Buscar wrestler, evento, empresa, estipulação…" aria-label="Buscar no backlog" />
+      <button type="button" class="botao botao-fantasma alternar-filtros" aria-expanded="false">Filtros</button>
       <select class="campo-entrada ordem" aria-label="Ordenar"></select>
       ${htmlAlternarVisao(lerVisao('backlog'))}
       <button type="button" class="botao botao-fantasma adicionar-evento">＋ Evento inteiro</button>
       <button type="button" class="botao botao-primario adicionar-luta">＋ Luta</button>
     </div>
+    <div class="painel-filtros" hidden>
+      <label class="campo"><span class="campo-rotulo">Empresa</span>
+        <select class="campo-entrada" data-filtro="empresa"><option value="">Todas</option></select>
+      </label>
+    </div>
+    <div class="filtros-ativos"></div>
     <p class="contador backlog-contador"></p>
     <div class="backlog-grupos"></div>`;
 
@@ -215,35 +233,62 @@ export async function telaBacklog(container) {
   async function recarregar() {
     dados = await carregarDados();
     dados.grupos = agrupar(dados.itens, dados.ctx);
+    // Opções do filtro: todas as empresas cadastradas (como na Biblioteca).
+    const empresas = [...dados.ctx.empresas.values()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    if (estado.filtros.empresa && !dados.ctx.empresas.has(estado.filtros.empresa)) estado.filtros.empresa = '';
+    const sel = $('[data-filtro="empresa"]');
+    sel.innerHTML = `<option value="">Todas</option>${empresas.map((e) => `<option value="${e.id}">${esc(e.nome)}</option>`).join('')}`;
+    sel.value = estado.filtros.empresa;
     render();
+  }
+
+  function renderFiltrosAtivos() {
+    const id = estado.filtros.empresa;
+    const e = id && dados.ctx.empresas.get(id);
+    $('.alternar-filtros').textContent = e ? 'Filtros (1)' : 'Filtros';
+    $('.filtros-ativos').innerHTML = e
+      ? `<span class="chip">${esc(e.sigla || e.nome)}<button type="button" class="chip-remover" data-limpar="empresa" aria-label="Remover filtro">✕</button></span>
+         <button type="button" class="limpar-filtros">Limpar filtros</button>`
+      : '';
   }
 
   function render() {
     const { itens, grupos, ctx, lutasPorEvento } = dados;
     const termo = normalizar(estado.busca);
-    const visiveis = ordenarGrupos(grupos.filter((g) => !termo || termo.split(' ').every((p) => g.busca.includes(p))));
+    const emp = estado.filtros.empresa;
+    const daEmpresa = (g) => !emp || [g.evento?.empresaId, ...(g.evento?.parceirasIds ?? [])].includes(emp);
+    const passaBusca = (i) => !termo || termo.split(' ').every((p) => i.busca.includes(p));
+    const visiveis = ordenarGrupos(grupos.filter((g) => daEmpresa(g) && (!termo || termo.split(' ').every((p) => g.busca.includes(p)))));
+    renderFiltrosAtivos();
     const nLutas = itens.filter((i) => i.tipo === 'luta').length;
     const nEventos = itens.length - nLutas;
-    $('.backlog-contador').textContent = itens.length
-      ? [nLutas && plural(nLutas, 'luta', 'lutas'), nEventos && plural(nEventos, 'evento inteiro', 'eventos inteiros')].filter(Boolean).join(' · ')
-      : '';
+    const nVisiveis = visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean)).filter(passaBusca).length;
+    $('.backlog-contador').textContent = !itens.length
+      ? ''
+      : nVisiveis !== itens.length
+        ? `${nVisiveis} de ${plural(itens.length, 'item', 'itens')}`
+        : [nLutas && plural(nLutas, 'luta', 'lutas'), nEventos && plural(nEventos, 'evento inteiro', 'eventos inteiros')].filter(Boolean).join(' · ');
     const el = $('.backlog-grupos');
     if (!visiveis.length) {
       el.innerHTML = `<div class="vazio"><div>
         <div class="vazio-icone" aria-hidden="true">☰</div>
         <strong>${itens.length ? 'Nada encontrado' : 'Backlog vazio'}</strong>
-        <span>${itens.length ? 'Tente outra busca.' : 'Adicione uma luta ou um evento inteiro que você quer assistir.'}</span>
+        <span>${itens.length ? 'Tente outra busca ou limpe os filtros.' : 'Adicione uma luta ou um evento inteiro que você quer assistir.'}</span>
       </div></div>`;
       return;
     }
     if (visao === 'lista') {
-      const linhas = ordenarItens(visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean))
-        .filter((i) => !termo || termo.split(' ').every((p) => i.busca.includes(p))));
+      const linhas = ordenarItens(visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean)).filter(passaBusca));
       el.innerHTML = `<table class="tabela-lutas tabela-backlog">${htmlCabecalho(COLUNAS_BACKLOG, estado.ordem)}
         <tbody>${linhas.map((i) => htmlLinhaBacklog(i, lutasPorEvento)).join('')}</tbody></table>`;
       return;
     }
-    el.innerHTML = visiveis.map((g) => htmlGrupo(g, ctx, lutasPorEvento)).join('');
+    // Em cada grupo, só os itens que batem com a busca (igual à lista).
+    el.innerHTML = visiveis
+      .map((g) => ({ ...g, inteiro: g.inteiro && passaBusca(g.inteiro) ? g.inteiro : null, lutas: g.lutas.filter(passaBusca) }))
+      .filter((g) => g.inteiro || g.lutas.length)
+      .map((g) => htmlGrupo(g, ctx, lutasPorEvento))
+      .join('');
   }
 
   // ---------- Painéis ----------
@@ -335,6 +380,25 @@ export async function telaBacklog(container) {
   });
   $('.ordem').addEventListener('change', (e) => {
     estado.ordem = e.target.value;
+    render();
+  });
+  $('.painel-filtros').hidden = !estado.painelAberto;
+  $('.alternar-filtros').setAttribute('aria-expanded', String(estado.painelAberto));
+  $('.alternar-filtros').addEventListener('click', () => {
+    estado.painelAberto = !estado.painelAberto;
+    $('.painel-filtros').hidden = !estado.painelAberto;
+    $('.alternar-filtros').setAttribute('aria-expanded', String(estado.painelAberto));
+  });
+  $('.painel-filtros').addEventListener('change', (e) => {
+    const el = e.target.closest('[data-filtro]');
+    if (!el) return;
+    estado.filtros[el.dataset.filtro] = el.value;
+    render();
+  });
+  $('.filtros-ativos').addEventListener('click', (e) => {
+    if (!e.target.closest('[data-limpar], .limpar-filtros')) return;
+    estado.filtros.empresa = '';
+    $('[data-filtro="empresa"]').value = '';
     render();
   });
   $('.adicionar-luta').addEventListener('click', () => abrirFormLuta());

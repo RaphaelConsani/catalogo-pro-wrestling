@@ -128,7 +128,23 @@
     flex-wrap: wrap;
   }
 
+  .backlog-barra {
+    gap: 10px;
+  }
+
   .backlog-barra .busca {
     flex-basis: 100%;
+  }
+
+  /* Filtros + ordem + alternador numa linha; os dois "adicionar" dividem a de baixo */
+  .backlog-barra .ordem {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .backlog-barra .adicionar-evento,
+  .backlog-barra .adicionar-luta {
+    flex: 1;
+    justify-content: center;
   }
 }

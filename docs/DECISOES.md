@@ -131,3 +131,8 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Backlog: **tabela corrida** (sem agrupar por evento), com o evento numa coluna e as ações em cada linha.
 - Celular: **esconde colunas**, ficando Nota, Confronto e Data.
 - Clicar no **cabeçalho ordena** pela coluna (de novo inverte); o seletor de ordem acompanha.
+
+## Revisão final · Empresa no Backlog
+
+- Backlog ganha filtro de **empresa** igual ao da Biblioteca: botão "Filtros" com painel (por ora só Empresa) e chip do filtro ativo. Considera **principal + parceiras** do evento.
+- Ordem por **empresa** (A–Z e Z–A) no seletor, nas duas visões; na lista, **coluna Empresa separada** com cabeçalho ordenável (escondida no celular).
