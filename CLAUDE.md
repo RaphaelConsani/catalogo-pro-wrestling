@@ -7,7 +7,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - **Não tome nenhuma decisão sozinho.** Se houver qualquer dúvida ou premissa a adotar, pergunte antes de executar. Avisar depois que já fez não serve.
 - **Trabalhe por etapas**, na ordem abaixo. A partir da etapa 6, o Claude valida cada etapa sozinho (funcionamento e visual), faz o commit e segue pra próxima; o usuário revisa tudo **numa rodada só no fim** (combinado em 17/11/2026). As perguntas sobre decisões continuam vindo **antes** de implementar cada etapa.
 - **Idioma:** a interface fica em português. Termos de wrestling (Singles, Tag Team, No DQ, Pinfall, Draw, Time Limit Draw, No Contest etc.) ficam em inglês.
-- **Commits** pequenos e descritivos ao fim de cada etapa validada.
+- **Commits** pequenos e descritivos ao fim de cada etapa validada. **Push no `main` está autorizado** (17/11/2026): enviar sem pedir confirmação; cada push publica o site. Outros comandos que mexam na conta do GitHub (criar repositório, mudar configurações etc.) continuam precisando de confirmação.
 - **Nunca salve backups JSON nem dados pessoais dentro da pasta do projeto.** O repositório é público.
 - **Fase 2** (iPhone e "importar e mesclar") está fora do trabalho atual, mas nenhuma decisão de modelagem pode dificultá-la (ex.: IDs precisam ser únicos globalmente).
 - **Divisão dos testes.** O Claude faz todos os testes funcionais (validações, banco, fluxos, regras) **e a validação visual** por conta própria, no Chrome headless com perfil temporário no scratchpad (via DevTools Protocol): prints de cada tela no computador (1440) e no celular (390), nas três cores de destaque, conferindo alinhamento, textos cortados, rolagem lateral e o dourado só onde deve. O usuário revisa tudo no fim, numa rodada só.
@@ -36,7 +36,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
 - [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
 - [x] Etapa 7 · Dados (tela em `src/telas/dados.js`, backup e lembrete em `src/db/backup.js`, Excel em `src/db/excel.js`, faixa em `src/componentes/lembrete-backup.js`; SheetJS sob demanda)
-- [ ] **Etapa 8 · Publicação — site no ar, falta o usuário instalar no Brave.** Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push continua precisando de confirmação do usuário.
+- [ ] **Etapa 8 · Publicação — site no ar, falta o usuário instalar no Brave.** Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push está autorizado pelo usuário (17/11/2026).
 - [ ] Etapa 9
 
 ### Pra revisão final (usuário)

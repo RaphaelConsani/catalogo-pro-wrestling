@@ -107,3 +107,5 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Repositório **catalogo-pro-wrestling** (público) → app em `https://<usuário>.github.io/catalogo-pro-wrestling/`.
 - Publicação **automática a cada push** (GitHub Actions → GitHub Pages).
 - App **instalável e funcionando offline**: manifesto com nome, ícone e janela própria + service worker.
+- Endereço continua `raphaelconsani.github.io/catalogo-pro-wrestling` por enquanto (cogitou-se esconder o nome com organização ou outro serviço; ficou pra depois — mudar exige exportar e restaurar o backup no endereço novo).
+- **Push autorizado** sem confirmação a cada vez (17/11/2026). Demais comandos na conta do GitHub continuam pedindo confirmação.
