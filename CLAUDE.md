@@ -36,7 +36,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
 - [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
 - [x] Etapa 7 · Dados (tela em `src/telas/dados.js`, backup e lembrete em `src/db/backup.js`, Excel em `src/db/excel.js`, faixa em `src/componentes/lembrete-backup.js`; SheetJS sob demanda)
-- [ ] **Etapa 8 · Publicação — site no ar, falta o usuário instalar no Brave.** Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push está autorizado pelo usuário (17/11/2026).
+- [x] Etapa 8 · Publicação (instalado no Brave do usuário em 17/11/2026). Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push está autorizado pelo usuário (17/11/2026).
 - [ ] Etapa 9
 
 ### Pra revisão final (usuário)
