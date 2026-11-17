@@ -77,3 +77,18 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Item concluído (luta registrada pelo "assisti" ou evento concluído) **some da lista**; fica no banco marcado como concluído.
 - Item de evento inteiro tem **"Registrar luta"** (abre a Nova luta com o evento preenchido) e **"Concluir evento"**; o card mostra quantas lutas daquele evento já foram registradas.
 - Tela **agrupada por evento** (evento inteiro e lutas avulsas do mesmo evento juntos), cards na cor da empresa, com busca e ordem por data do evento ou por data em que foi adicionado.
+
+## Etapa 6 · Dashboards
+
+- Ranking de wrestlers: mínimo de lutas **ajustável na tela, começa em 5**.
+- Filtros no topo que valem pra todos os gráficos: **ano** (ou Todos) e **empresa** (só a principal).
+- O filtro de ano usa o **ano da 1ª visualização** (como as contagens e o calendário).
+- Calendário de atividade: **um ano por vez**, estilo GitHub, com setas pra trocar de ano.
+- Atraso evento → 1ª visualização: **barras por faixa** (mesmo dia, até 1 semana, até 1 mês, até 1 ano, até 5 anos, mais de 5 anos) + atraso mediano e maior atraso.
+- Lista de lutas 5★ e acima de 4½: **de 4.50 pra cima**.
+- Nota média por empresa e por tipo: **todas aparecem**, com a quantidade de lutas no rótulo (sem mínimo).
+- ECharts carregado **sob demanda** (`import()` dinâmico) nos Dashboards e na página do wrestler.
+
+## Forma de trabalho (a partir da etapa 6)
+
+- O Claude valida sozinho funcionamento **e visual** de cada etapa, faz o commit e segue; o usuário revisa tudo numa rodada só no fim. Perguntas de decisão continuam vindo antes de implementar. Etapas 8 (comandos no GitHub) e 9 (leitura das colunas) continuam precisando do usuário.

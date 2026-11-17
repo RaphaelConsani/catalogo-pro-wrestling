@@ -5,12 +5,13 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 ## Regras
 
 - **Não tome nenhuma decisão sozinho.** Se houver qualquer dúvida ou premissa a adotar, pergunte antes de executar. Avisar depois que já fez não serve.
-- **Trabalhe por etapas**, na ordem abaixo. No fim de cada etapa, mostre o que foi feito, diga como testar e espere aprovação antes de começar a próxima.
+- **Trabalhe por etapas**, na ordem abaixo. A partir da etapa 6, o Claude valida cada etapa sozinho (funcionamento e visual), faz o commit e segue pra próxima; o usuário revisa tudo **numa rodada só no fim** (combinado em 17/11/2026). As perguntas sobre decisões continuam vindo **antes** de implementar cada etapa.
 - **Idioma:** a interface fica em português. Termos de wrestling (Singles, Tag Team, No DQ, Pinfall, Draw, Time Limit Draw, No Contest etc.) ficam em inglês.
-- **Commits** pequenos e descritivos ao fim de cada etapa aprovada.
+- **Commits** pequenos e descritivos ao fim de cada etapa validada.
 - **Nunca salve backups JSON nem dados pessoais dentro da pasta do projeto.** O repositório é público.
 - **Fase 2** (iPhone e "importar e mesclar") está fora do trabalho atual, mas nenhuma decisão de modelagem pode dificultá-la (ex.: IDs precisam ser únicos globalmente).
-- **Divisão dos testes.** O Claude faz todos os testes funcionais (validações, banco, fluxos, regras) por conta própria, no Chrome headless com perfil temporário no scratchpad (via DevTools Protocol), e confere prints. O usuário avalia **só o visual** em cada etapa; o teste funcional "pra valer" dele fica pra versão final. No fim de cada etapa, o "como testar" pra ele é um roteiro curto do que olhar no visual, não uma bateria de validações.
+- **Divisão dos testes.** O Claude faz todos os testes funcionais (validações, banco, fluxos, regras) **e a validação visual** por conta própria, no Chrome headless com perfil temporário no scratchpad (via DevTools Protocol): prints de cada tela no computador (1440) e no celular (390), nas três cores de destaque, conferindo alinhamento, textos cortados, rolagem lateral e o dourado só onde deve. O usuário revisa tudo no fim, numa rodada só.
+- **Revisão final.** Cada etapa validada entra na seção "Pra revisão final" abaixo: o que olhar e as escolhas que o Claude fez sozinho (detalhes de visual) pra o usuário aprovar ou mudar. Ajustes pedidos lá são feitos numa rodada só.
 - **Decisões já tomadas** ficam registradas em [docs/DECISOES.md](docs/DECISOES.md). Consulte antes de perguntar de novo; acrescente cada nova decisão lá.
 
 ## Etapas da fase 1
@@ -33,13 +34,18 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 4 · Biblioteca e página do wrestler
   - As lutas de teste estão no Brave dele: lembrar de apagar antes do uso real (`indexedDB.deleteDatabase("catalogo-pro-wrestling")` no console).
 - [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
-- [ ] Etapas 6 a 9
+- [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
+- [ ] Etapas 7 a 9
+
+### Pra revisão final (usuário)
+
+- **Etapa 6 · Dashboards.** Olhar: a tela inteira, os filtros de ano e empresa, o mínimo do ranking, as setas do calendário, o dourado nos destaques e a troca de cor de destaque. Escolhas do Claude: linha de números no topo (lutas, nota média, 5★, wrestlers diferentes); contagem de 5★ e barras de 4.50+ da distribuição em dourado; ranking mostra 25 e destaques 12, com "Mostrar todos"; com ano escolhido some "Lutas por ano", com empresa escolhida some "Nota média por empresa".
 
 ### Pendências e lembretes pra próximas etapas
 
 - Dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ e acima de 4½ — inclusive nos gráficos (use o neon).
-- Etapa 6: `src/db/catalogo.js` (`carregarCatalogo`) já devolve as lutas enriquecidas com nota mais recente e 1ª visualização; `src/util/graficos.js` tem o ECharts configurado (importando só os módulos usados — acrescente os novos tipos de gráfico lá).
-- Build avisa que o JS passou de 500 kB (ECharts). Na etapa 6, considerar carregar os gráficos sob demanda (`import()` dinâmico) — perguntar antes.
+- ECharts: cores passadas pra ele precisam da sintaxe antiga com vírgulas (`rgba(r, g, b, a)`); a sintaxe nova do CSS vira preto. `coresTema()` já cuida disso.
+- O build ainda avisa que o pedaço dos gráficos (~600 kB) passou de 500 kB, mas ele só carrega sob demanda; o app principal ficou com ~200 kB.
 - O Início ainda abre a edição ao clicar numa luta (decidido na etapa 3); o detalhe em painel está em `src/componentes/detalhe-luta.js`.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 

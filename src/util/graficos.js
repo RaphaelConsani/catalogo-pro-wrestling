@@ -1,24 +1,33 @@
 import * as echarts from 'echarts/core';
-import { BarChart, LineChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent } from 'echarts/components';
+import { BarChart, LineChart, HeatmapChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent, CalendarComponent, VisualMapComponent, DataZoomComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
 // Só os módulos usados entram no build (o ECharts completo é bem pesado).
-echarts.use([BarChart, LineChart, GridComponent, TooltipComponent, CanvasRenderer]);
+// Este arquivo é carregado sob demanda (import() dinâmico) nas telas com gráficos.
+echarts.use([
+  BarChart, LineChart, HeatmapChart,
+  GridComponent, TooltipComponent, CalendarComponent, VisualMapComponent, DataZoomComponent,
+  CanvasRenderer,
+]);
 
 // Cores lidas do tema na hora de desenhar (acompanham a cor de destaque escolhida).
 export function coresTema() {
   const css = getComputedStyle(document.documentElement);
   const v = (n) => css.getPropertyValue(n).trim();
+  // O ECharts só entende a sintaxe antiga com vírgulas: rgba(34, 230, 255, 0.25)
+  const rgb = v('--neon-rgb').split(/\s+/).join(', ');
   return {
-    neon: `rgb(${v('--neon-rgb')})`,
-    neonFraco: `rgb(${v('--neon-rgb')} / 0.25)`,
+    neon: `rgb(${rgb})`,
+    neonFraco: `rgba(${rgb}, 0.25)`,
     ouro: v('--ouro'),
     texto: v('--texto'),
     textoSuave: v('--texto-suave'),
     textoFraco: v('--texto-fraco'),
     borda: v('--borda'),
     superficie: v('--superficie-2'),
+    vazio: v('--superficie'),
+    fundo: v('--fundo-elevado'),
     fonte: 'Barlow, system-ui, sans-serif',
   };
 }
@@ -53,11 +62,13 @@ export const eixoValores = (c, extra = {}) => ({
   ...extra,
 });
 
-// Cria o gráfico e cuida do redimensionamento; libera a memória quando a tela sai.
+// Cria o gráfico e cuida do redimensionamento; libera a memória quando a tela sai
+// (ou quando quem criou chama grafico.dispose() pra redesenhar).
 export function montarGrafico(el, opcoes) {
   const grafico = echarts.init(el, null, { renderer: 'canvas' });
   grafico.setOption(opcoes);
   const aoRedimensionar = () => {
+    if (grafico.isDisposed()) return window.removeEventListener('resize', aoRedimensionar);
     if (!el.isConnected) {
       window.removeEventListener('resize', aoRedimensionar);
       grafico.dispose();

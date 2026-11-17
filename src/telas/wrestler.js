@@ -5,7 +5,6 @@ import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { ORDENACOES, ordenar } from './biblioteca.js';
 import { esc, iniciais, plural } from '../util/texto.js';
-import { coresTema, baseGrafico, eixoCategorias, eixoValores, montarGrafico } from '../util/graficos.js';
 
 const media = (ns) => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : null);
 const fmt2 = (n) => n.toFixed(2);
@@ -87,7 +86,7 @@ export async function telaWrestler(container, { id }) {
   if (lutas.length) desenharGraficos(container, lutas);
 }
 
-function desenharGraficos(container, lutas) {
+async function desenharGraficos(container, lutas) {
   const comAno = lutas.filter((i) => i.ano);
   if (!comAno.length) return;
   const min = Math.min(...comAno.map((i) => i.ano));
@@ -100,6 +99,9 @@ function desenharGraficos(container, lutas) {
     return m == null ? null : Number(m.toFixed(2));
   });
 
+  // ECharts sob demanda: só baixa quando a tela tem gráfico.
+  const { coresTema, baseGrafico, eixoCategorias, eixoValores, montarGrafico } = await import('../util/graficos.js');
+  if (!container.isConnected) return;
   const c = coresTema();
   const base = baseGrafico(c);
   montarGrafico(container.querySelector('[data-grafico="lutas"]'), {

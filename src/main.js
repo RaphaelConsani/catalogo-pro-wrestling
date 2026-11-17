@@ -12,6 +12,7 @@ import './estilos/cadastros.css';
 import './estilos/luta.css';
 import './estilos/biblioteca.css';
 import './estilos/backlog.css';
+import './estilos/dashboards.css';
 
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';
@@ -20,6 +21,7 @@ import { telaInicio } from './telas/inicio.js';
 import { telaNovaLuta, telaEditarLuta } from './telas/luta/formulario.js';
 import { telaBiblioteca } from './telas/biblioteca.js';
 import { telaWrestler } from './telas/wrestler.js';
+import { telaDashboards } from './telas/dashboards.js';
 import { telaBacklog, telaAssistiBacklog, telaRegistrarEventoBacklog } from './telas/backlog.js';
 import { telaCadastros, telaCadastro } from './telas/cadastros/cadastros.js';
 import { montarSeletorAcento } from './componentes/seletor-acento.js';
@@ -38,11 +40,7 @@ definirRota('/nova-luta', telaNovaLuta);
 definirRota('/luta/:id/editar', telaEditarLuta);
 definirRota('/biblioteca', telaBiblioteca);
 definirRota('/wrestler/:id', telaWrestler);
-definirRota('/dashboards', telaProvisoria({
-  rotulo: 'Estatísticas', titulo: 'Dashboards', icone: '◔',
-  descricao: 'Lutas por período, notas médias, rankings e calendário de atividade.',
-  etapa: 'Etapa 6 · Dashboards',
-}));
+definirRota('/dashboards', telaDashboards);
 definirRota('/backlog', telaBacklog);
 definirRota('/backlog/:id/assisti', telaAssistiBacklog);
 definirRota('/backlog/:id/registrar', telaRegistrarEventoBacklog);
