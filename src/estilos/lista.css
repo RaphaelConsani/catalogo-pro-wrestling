@@ -1,0 +1,306 @@
+/* ---------- Cards ou lista ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.alternar-visao {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--fundo-elevado);
+}
+
+.alternar-visao-opcao {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.alternar-visao-opcao:hover {
+  color: var(--texto);
+}
+
+.alternar-visao-opcao.ativo {
+  background: var(--neon-fundo);
+  color: var(--neon);
+  box-shadow: inset 0 0 0 1px rgb(var(--neon-rgb) / 0.45);
+}
+
+/* Ícones desenhados com CSS (2×2 quadrados / 3 linhas), na cor do texto do botão */
+.icone-cards,
+.icone-lista {
+  position: relative;
+  width: 16px;
+  height: 14px;
+}
+
+.icone-cards {
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 7px 6px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 0 / 7px 6px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 7px 6px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 100% / 7px 6px no-repeat;
+}
+
+.icone-lista {
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 50% / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 100% 2px no-repeat;
+}
+
+.grade-lutas.em-lista {
+  display: block;
+}
+
+/* ---------- Tabela ---------- */
+.tabela-lutas {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo-elevado);
+  font-size: 15px;
+}
+
+/* Cantos arredondados nas células (sem overflow: hidden, que quebraria o cabeçalho fixo) */
+.tabela-lutas thead th:first-child {
+  border-top-left-radius: var(--raio);
+}
+
+.tabela-lutas thead th:last-child {
+  border-top-right-radius: var(--raio);
+}
+
+.tabela-lutas tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--raio);
+}
+
+.tabela-lutas tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--raio);
+}
+
+.tabela-lutas th {
+  position: sticky;
+  top: var(--altura-topo);
+  z-index: 1;
+  padding: 0;
+  border-bottom: 1px solid var(--borda-forte);
+  background: var(--superficie);
+  text-align: left;
+}
+
+.tabela-lutas th:not(:has(button)) {
+  padding: 12px 14px;
+}
+
+.ordenar-coluna {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: var(--texto-fraco);
+  font: 700 12px/1 var(--fonte-texto);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ordenar-coluna:hover {
+  color: var(--texto);
+}
+
+.ordenar-coluna.ativo {
+  color: var(--neon);
+}
+
+.ordenar-coluna .seta {
+  font-size: 9px;
+}
+
+.tabela-lutas td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--borda);
+  color: var(--texto-suave);
+  vertical-align: middle;
+}
+
+.tabela-lutas tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela-lutas tbody tr {
+  transition: background 0.12s;
+}
+
+.tabela-lutas tbody tr:hover {
+  background: rgb(255 255 255 / 0.03);
+}
+
+/* Faixa na cor da empresa, no começo da linha */
+.tabela-lutas tbody td:first-child {
+  box-shadow: inset 3px 0 0 var(--cor-empresa);
+}
+
+.linha-luta {
+  cursor: pointer;
+}
+
+.linha-luta:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: -2px;
+}
+
+.tabela-lutas .col-nota {
+  width: 1%;
+  white-space: nowrap;
+  font-family: var(--fonte-titulo);
+  font-size: 19px;
+  color: var(--texto);
+}
+
+.tabela-lutas th.col-nota {
+  font-family: inherit;
+}
+
+.linha-luta.nota-alta .col-nota {
+  color: var(--ouro);
+  text-shadow: var(--ouro-brilho);
+}
+
+.linha-luta.cinco-estrelas {
+  background: linear-gradient(90deg, rgb(245 197 66 / 0.08), transparent 45%);
+}
+
+.tabela-lutas .col-confronto {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.tabela-lutas .col-data,
+.tabela-lutas .col-assistida {
+  width: 1%;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela-lutas .col-empresa,
+.tabela-lutas .col-tipo {
+  white-space: nowrap;
+}
+
+.sigla-empresa {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--cor-empresa) 70%, transparent);
+  background: color-mix(in srgb, var(--cor-empresa) 14%, transparent);
+  color: var(--texto);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* Backlog */
+.tabela-backlog .col-evento {
+  color: var(--texto);
+}
+
+.tabela-backlog .col-evento .sigla-empresa {
+  margin-right: 6px;
+}
+
+.tabela-backlog .col-confronto small {
+  display: block;
+  color: var(--texto-fraco);
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.tabela-backlog .col-acoes {
+  width: 1%;
+}
+
+.acoes-linha {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.acoes-linha .botao-icone {
+  width: 32px;
+  height: 32px;
+}
+
+.so-celular {
+  display: none;
+}
+
+.dash-destaques-acoes {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Celular: Nota, Confronto e Data (no Backlog, Confronto, Data e ações) */
+@media (max-width: 720px) {
+  .tabela-lutas .opcional {
+    display: none;
+  }
+  .tabela-lutas td,
+  .ordenar-coluna {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .so-celular {
+    display: block;
+    margin-top: 2px;
+    color: var(--texto-fraco);
+    font-weight: 400;
+    font-size: 13px;
+  }
+  .acoes-linha .botao-pequeno {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .acoes-linha {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  /* Barras com o alternador: busca numa linha, os controles na de baixo */
+  .biblioteca-barra,
+  .wrestler-lutas .barra-ferramentas {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .biblioteca-barra .busca {
+    flex: 1 1 100%;
+  }
+  .biblioteca-barra .ordem,
+  .wrestler-lutas .ordem {
+    flex: 1;
+    min-width: 0;
+  }
+}

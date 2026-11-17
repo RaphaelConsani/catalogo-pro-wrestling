@@ -7,11 +7,28 @@ import { abrirPainel, fecharPainel } from '../componentes/painel.js';
 import { confirmar } from '../componentes/dialogo.js';
 import { toast } from '../componentes/toast.js';
 import { esc, normalizar, formatarData, plural } from '../util/texto.js';
+import { lerVisao, htmlAlternarVisao, ligarAlternarVisao, htmlCabecalho } from '../componentes/visao.js';
 
 const ORDENS = {
   adicionado: 'Adicionados por último',
   evento_desc: 'Evento mais recente',
   evento_asc: 'Evento mais antigo',
+  eventonome_asc: 'Evento (A–Z)',
+  eventonome_desc: 'Evento (Z–A)',
+  confronto_asc: 'Confronto (A–Z)',
+  confronto_desc: 'Confronto (Z–A)',
+  tipo_asc: 'Tipo (A–Z)',
+  tipo_desc: 'Tipo (Z–A)',
+};
+// Na visão em cards (agrupada por evento) não dá pra ordenar por confronto ou tipo.
+const ORDENS_GRUPOS = ['adicionado', 'evento_desc', 'evento_asc', 'eventonome_asc', 'eventonome_desc'];
+const alfa = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+// Texto vazio vai sempre pro fim, nas duas direções.
+const porTexto = (f, dir = 1) => (a, b) => {
+  const x = f(a) ?? '';
+  const y = f(b) ?? '';
+  if (!x || !y) return (x ? 0 : 1) - (y ? 0 : 1);
+  return dir * alfa.compare(x, y);
 };
 // Busca e ordem ficam guardadas durante a sessão.
 const estado = { busca: '', ordem: 'adicionado' };
@@ -46,14 +63,21 @@ function agrupar(itens, ctx) {
   }
   for (const g of grupos.values()) {
     g.lutas.sort((a, b) => cmp(a.criadoEm, b.criadoEm));
-    const partes = [g.evento?.nome, g.empresa?.nome, g.empresa?.sigla];
-    for (const l of g.lutas) {
-      partes.push(ctx.tipos.get(l.tipoMatchId)?.nome, ...l.estipulacoesIds.map((id) => ctx.estipulacoes.get(id)?.nome));
-      for (const lado of l.lados) {
-        partes.push(ctx.equipes.get(lado.equipeId)?.nome, ...lado.wrestlersIds.map((id) => ctx.wrestlers.get(id)?.nome));
+    const doEvento = [g.evento?.nome, g.empresa?.nome, g.empresa?.sigla];
+    for (const item of [g.inteiro, ...g.lutas].filter(Boolean)) {
+      const partes = [...doEvento];
+      if (item.tipo === 'luta') {
+        item.confronto = item.lados.map((l) => nomeLado(l, ctx)).join(' vs ');
+        item.nomeTipo = ctx.tipos.get(item.tipoMatchId)?.nome ?? '';
+        partes.push(item.nomeTipo, ...item.estipulacoesIds.map((id) => ctx.estipulacoes.get(id)?.nome));
+        for (const lado of item.lados) {
+          partes.push(ctx.equipes.get(lado.equipeId)?.nome, ...lado.wrestlersIds.map((id) => ctx.wrestlers.get(id)?.nome));
+        }
       }
+      item.grupo = g;
+      item.busca = normalizar(partes.filter(Boolean).join(' '));
     }
-    g.busca = normalizar(partes.filter(Boolean).join(' '));
+    g.busca = [g.inteiro, ...g.lutas].filter(Boolean).map((i) => i.busca).join(' ');
   }
   return [...grupos.values()];
 }
@@ -64,8 +88,56 @@ function ordenarGrupos(grupos) {
     adicionado: (a, b) => cmp(b.adicionadoEm, a.adicionadoEm),
     evento_desc: (a, b) => porEvento(b, a),
     evento_asc: porEvento,
-  }[estado.ordem];
+    eventonome_asc: porTexto((g) => g.evento?.nome),
+    eventonome_desc: porTexto((g) => g.evento?.nome, -1),
+  }[estado.ordem] ?? ((a, b) => cmp(b.adicionadoEm, a.adicionadoEm));
   return [...grupos].sort(comparar);
+}
+
+// ---------- Visão em lista: tabela corrida, um item por linha ----------
+function ordenarItens(itens) {
+  const porEvento = (a, b) => cmp(a.grupo.evento?.data, b.grupo.evento?.data) || cmp(a.grupo.evento?.nome, b.grupo.evento?.nome);
+  const comparar = {
+    adicionado: (a, b) => cmp(b.criadoEm, a.criadoEm),
+    evento_desc: (a, b) => porEvento(b, a),
+    evento_asc: porEvento,
+    eventonome_asc: porTexto((i) => i.grupo.evento?.nome),
+    eventonome_desc: porTexto((i) => i.grupo.evento?.nome, -1),
+    confronto_asc: porTexto((i) => i.confronto),
+    confronto_desc: porTexto((i) => i.confronto, -1),
+    tipo_asc: porTexto((i) => i.nomeTipo),
+    tipo_desc: porTexto((i) => i.nomeTipo, -1),
+  }[estado.ordem];
+  return [...itens].sort((a, b) => comparar(a, b) || cmp(b.criadoEm, a.criadoEm));
+}
+
+const COLUNAS_BACKLOG = [
+  { rotulo: 'Evento', ordem: ['eventonome_asc', 'eventonome_desc'], seta: ['▲', '▼'], classe: 'col-evento opcional' },
+  { rotulo: 'Data', ordem: ['evento_desc', 'evento_asc'], seta: ['▼', '▲'], classe: 'col-data' },
+  { rotulo: 'Confronto', ordem: ['confronto_asc', 'confronto_desc'], seta: ['▲', '▼'], classe: 'col-confronto' },
+  { rotulo: 'Tipo', ordem: ['tipo_asc', 'tipo_desc'], seta: ['▲', '▼'], classe: 'col-tipo opcional' },
+  { rotulo: '', classe: 'col-acoes' },
+];
+
+function htmlLinhaBacklog(item, lutasPorEvento) {
+  const { evento, empresa } = item.grupo;
+  const eventoInteiro = item.tipo === 'evento';
+  const n = eventoInteiro ? lutasPorEvento.get(item.eventoId) ?? 0 : 0;
+  const acoes = eventoInteiro
+    ? `<a class="botao botao-primario botao-pequeno" href="#/backlog/${item.id}/registrar">＋ Registrar luta</a>
+       <button type="button" class="botao botao-fantasma botao-pequeno" data-acao="concluir">Concluir</button>`
+    : `<a class="botao botao-primario botao-pequeno" href="#/backlog/${item.id}/assisti">✓ Assisti</a>
+       <button type="button" class="botao-icone" data-acao="editar" aria-label="Editar" title="Editar">✎</button>`;
+  return `<tr class="linha-backlog${eventoInteiro ? ' linha-evento-inteiro' : ''}" data-item="${item.id}" style="--cor-empresa:${esc(empresa?.cor ?? '#3a4152')}">
+    <td class="col-evento opcional"><span class="sigla-empresa">${esc(empresa?.sigla || empresa?.nome || '?')}</span> ${esc(evento?.nome ?? 'Evento excluído')}</td>
+    <td class="col-data">${evento?.data ? formatarData(evento.data) : '—'}</td>
+    <td class="col-confronto">${eventoInteiro
+      ? `<strong>Evento inteiro</strong><small>${n ? plural(n, 'luta registrada', 'lutas registradas') : 'nenhuma luta registrada'}</small><span class="so-celular">${esc(evento?.nome ?? '')}</span>`
+      : `${esc(item.confronto)}<span class="so-celular">${esc(evento?.nome ?? '')}</span>`}</td>
+    <td class="col-tipo opcional">${esc(eventoInteiro ? '—' : item.nomeTipo || '—')}</td>
+    <td class="col-acoes"><span class="acoes-linha">${acoes}
+      <button type="button" class="botao-icone" data-acao="remover" aria-label="Remover do backlog" title="Remover do backlog">✕</button></span></td>
+  </tr>`;
 }
 
 function htmlCardEvento(item, lutasRegistradas) {
@@ -118,9 +190,8 @@ export async function telaBacklog(container) {
     </section>
     <div class="barra-ferramentas backlog-barra">
       <input type="search" class="campo-entrada busca" placeholder="Buscar wrestler, evento, empresa, estipulação…" aria-label="Buscar no backlog" />
-      <select class="campo-entrada ordem" aria-label="Ordenar">
-        ${Object.entries(ORDENS).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}
-      </select>
+      <select class="campo-entrada ordem" aria-label="Ordenar"></select>
+      ${htmlAlternarVisao(lerVisao('backlog'))}
       <button type="button" class="botao botao-fantasma adicionar-evento">＋ Evento inteiro</button>
       <button type="button" class="botao botao-primario adicionar-luta">＋ Luta</button>
     </div>
@@ -129,8 +200,17 @@ export async function telaBacklog(container) {
 
   const $ = (s) => container.querySelector(s);
   $('.busca').value = estado.busca;
-  $('.ordem').value = estado.ordem;
   let dados;
+  let visao = lerVisao('backlog');
+
+  // Opções do seletor conforme a visão (em cards, só as que funcionam agrupadas).
+  function montarOrdens() {
+    const chaves = visao === 'lista' ? Object.keys(ORDENS) : ORDENS_GRUPOS;
+    if (!chaves.includes(estado.ordem)) estado.ordem = 'adicionado';
+    $('.ordem').innerHTML = chaves.map((k) => `<option value="${k}">${ORDENS[k]}</option>`).join('');
+    $('.ordem').value = estado.ordem;
+  }
+  montarOrdens();
 
   async function recarregar() {
     dados = await carregarDados();
@@ -154,6 +234,13 @@ export async function telaBacklog(container) {
         <strong>${itens.length ? 'Nada encontrado' : 'Backlog vazio'}</strong>
         <span>${itens.length ? 'Tente outra busca.' : 'Adicione uma luta ou um evento inteiro que você quer assistir.'}</span>
       </div></div>`;
+      return;
+    }
+    if (visao === 'lista') {
+      const linhas = ordenarItens(visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean))
+        .filter((i) => !termo || termo.split(' ').every((p) => i.busca.includes(p))));
+      el.innerHTML = `<table class="tabela-lutas tabela-backlog">${htmlCabecalho(COLUNAS_BACKLOG, estado.ordem)}
+        <tbody>${linhas.map((i) => htmlLinhaBacklog(i, lutasPorEvento)).join('')}</tbody></table>`;
       return;
     }
     el.innerHTML = visiveis.map((g) => htmlGrupo(g, ctx, lutasPorEvento)).join('');
@@ -252,7 +339,18 @@ export async function telaBacklog(container) {
   });
   $('.adicionar-luta').addEventListener('click', () => abrirFormLuta());
   $('.adicionar-evento').addEventListener('click', abrirFormEvento);
+  ligarAlternarVisao(container.querySelector('.alternar-visao'), 'backlog', (v) => {
+    visao = v;
+    montarOrdens();
+    render();
+  });
   $('.backlog-grupos').addEventListener('click', (e) => {
+    const ordem = e.target.closest('[data-ordem]')?.dataset.ordem;
+    if (ordem) {
+      estado.ordem = ordem;
+      $('.ordem').value = ordem;
+      return render();
+    }
     const acao = e.target.closest('[data-acao]')?.dataset.acao;
     const id = e.target.closest('[data-item]')?.dataset.item;
     const item = id && dados.itens.find((i) => i.id === id);

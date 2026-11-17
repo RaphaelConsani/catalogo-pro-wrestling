@@ -1,6 +1,8 @@
 import { carregarCatalogo, desfechoPara } from '../db/catalogo.js';
 import { urlsImagens } from '../db/repo.js';
 import { htmlCardLuta } from '../componentes/card-luta.js';
+import { htmlTabelaLutas, ligarTecladoLinhas } from '../componentes/tabela-lutas.js';
+import { lerVisao, htmlAlternarVisao, ligarAlternarVisao } from '../componentes/visao.js';
 import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { ORDENACOES, ordenar } from './biblioteca.js';
@@ -65,23 +67,45 @@ export async function telaWrestler(container, { id }) {
         <select class="campo-entrada ordem" aria-label="Ordenar">
           ${Object.entries(ORDENACOES).map(([k, o]) => `<option value="${k}">${o.nome}</option>`).join('')}
         </select>
+        ${htmlAlternarVisao(lerVisao('wrestler'))}
       </div>
       <div class="grade-lutas"></div>
     </section>`;
 
   const elGrade = container.querySelector('.grade-lutas');
-  const render = (ordem) => {
-    elGrade.innerHTML = lutas.length
-      ? ordenar(lutas, ordem).map((i) => htmlCardLuta(i, ctx)).join('')
-      : `<div class="vazio"><div><strong>Nenhuma luta assistida com ${esc(w.nome)}</strong></div></div>`;
+  const elOrdem = container.querySelector('.ordem');
+  let ordem = 'recente';
+  let visao = lerVisao('wrestler');
+  const render = () => {
+    elGrade.classList.toggle('em-lista', visao === 'lista' && lutas.length > 0);
+    if (!lutas.length) {
+      elGrade.innerHTML = `<div class="vazio"><div><strong>Nenhuma luta assistida com ${esc(w.nome)}</strong></div></div>`;
+      return;
+    }
+    const lista = ordenar(lutas, ordem);
+    elGrade.innerHTML = visao === 'lista' ? htmlTabelaLutas(lista, ordem) : lista.map((i) => htmlCardLuta(i, ctx)).join('');
   };
-  container.querySelector('.ordem').addEventListener('change', (e) => render(e.target.value));
+  elOrdem.addEventListener('change', (e) => {
+    ordem = e.target.value;
+    render();
+  });
+  ligarAlternarVisao(container.querySelector('.alternar-visao'), 'wrestler', (v) => {
+    visao = v;
+    render();
+  });
+  ligarTecladoLinhas(elGrade);
   elGrade.addEventListener('click', (e) => {
+    const nova = e.target.closest('[data-ordem]')?.dataset.ordem;
+    if (nova) {
+      ordem = nova;
+      elOrdem.value = nova;
+      return render();
+    }
     const lutaId = e.target.closest('[data-luta]')?.dataset.luta;
     const item = lutaId && lutas.find((i) => i.luta.id === lutaId);
     if (item) abrirDetalheLuta(item, ctx);
   });
-  render('recente');
+  render();
 
   if (lutas.length) desenharGraficos(container, lutas);
 }

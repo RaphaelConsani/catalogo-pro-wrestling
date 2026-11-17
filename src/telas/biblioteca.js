@@ -1,20 +1,42 @@
 import { carregarCatalogo, NOME_RESULTADO } from '../db/catalogo.js';
 import { htmlCardLuta } from '../componentes/card-luta.js';
+import { htmlTabelaLutas, htmlLinhaLuta, ligarTecladoLinhas } from '../componentes/tabela-lutas.js';
+import { lerVisao, htmlAlternarVisao, ligarAlternarVisao } from '../componentes/visao.js';
 import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { esc, normalizar, formatarData, plural } from '../util/texto.js';
 import { formatarNota } from '../util/nota.js';
 
 const LOTE = 60;
 
+const cmp = (a, b) => (a ?? '').localeCompare(b ?? '');
+const alfa = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+// Texto vazio vai sempre pro fim, nas duas direções.
+const porTexto = (f, dir = 1) => (a, b) => {
+  const x = f(a) ?? '';
+  const y = f(b) ?? '';
+  if (!x || !y) return (x ? 0 : 1) - (y ? 0 : 1);
+  return dir * alfa.compare(x, y);
+};
+const empresaDe = (i) => i.empresa?.sigla || i.empresa?.nome;
+
+// As de texto (A–Z) também são usadas pelo cabeçalho da tabela na visão em lista.
 export const ORDENACOES = {
   recente: { nome: 'Assistidas por último', comparar: (a, b) => cmp(b.ultimaVisualizacao, a.ultimaVisualizacao) },
+  antiga: { nome: 'Assistidas há mais tempo', comparar: (a, b) => cmp(a.ultimaVisualizacao, b.ultimaVisualizacao) },
   evento_desc: { nome: 'Evento mais recente', comparar: (a, b) => cmp(b.evento?.data, a.evento?.data) },
   evento_asc: { nome: 'Evento mais antigo', comparar: (a, b) => cmp(a.evento?.data, b.evento?.data) },
   nota_desc: { nome: 'Maior nota', comparar: (a, b) => (b.nota ?? -1) - (a.nota ?? -1) },
   nota_asc: { nome: 'Menor nota', comparar: (a, b) => (a.nota ?? 99) - (b.nota ?? 99) },
   duracao_desc: { nome: 'Mais longa', comparar: (a, b) => (b.luta.duracaoSeg ?? -1) - (a.luta.duracaoSeg ?? -1) },
+  confronto_asc: { nome: 'Confronto (A–Z)', comparar: porTexto((i) => i.confronto) },
+  confronto_desc: { nome: 'Confronto (Z–A)', comparar: porTexto((i) => i.confronto, -1) },
+  empresa_asc: { nome: 'Empresa (A–Z)', comparar: porTexto(empresaDe) },
+  empresa_desc: { nome: 'Empresa (Z–A)', comparar: porTexto(empresaDe, -1) },
+  eventonome_asc: { nome: 'Evento (A–Z)', comparar: porTexto((i) => i.evento?.nome) },
+  eventonome_desc: { nome: 'Evento (Z–A)', comparar: porTexto((i) => i.evento?.nome, -1) },
+  tipo_asc: { nome: 'Tipo (A–Z)', comparar: porTexto((i) => i.tipo?.nome) },
+  tipo_desc: { nome: 'Tipo (Z–A)', comparar: porTexto((i) => i.tipo?.nome, -1) },
 };
-const cmp = (a, b) => (a ?? '').localeCompare(b ?? '');
 
 // Ordena com desempate pela luta cadastrada mais recentemente.
 export const ordenar = (itens, chave) =>
@@ -84,6 +106,7 @@ export async function telaBiblioteca(container) {
       <select class="campo-entrada ordem" aria-label="Ordenar">
         ${Object.entries(ORDENACOES).map(([k, o]) => `<option value="${k}">${o.nome}</option>`).join('')}
       </select>
+      ${htmlAlternarVisao(lerVisao('biblioteca'))}
     </div>
     <div class="painel-filtros" hidden>
       ${DEF_FILTROS.map(([k, rotulo, html]) => `
@@ -103,6 +126,7 @@ export async function telaBiblioteca(container) {
   const elPainel = $('.painel-filtros');
   let resultado = [];
   let mostrados = 0;
+  let visao = lerVisao('biblioteca');
 
   // Restaura o estado da sessão nos controles.
   elBusca.value = estado.filtros.busca;
@@ -128,6 +152,7 @@ export async function telaBiblioteca(container) {
     resultado = ordenar(aplicarFiltros(itens), estado.ordem);
     mostrados = 0;
     elGrade.replaceChildren();
+    elGrade.classList.toggle('em-lista', visao === 'lista');
     renderAtivos();
     const filtrando = resultado.length !== itens.length;
     $('.biblioteca-contador').textContent = filtrando
@@ -141,13 +166,15 @@ export async function telaBiblioteca(container) {
       </div></div>`;
       return;
     }
+    if (visao === 'lista') elGrade.innerHTML = htmlTabelaLutas([], estado.ordem);
     mostrarMais();
   }
 
   function mostrarMais() {
     if (mostrados >= resultado.length) return;
     const lote = resultado.slice(mostrados, mostrados + LOTE);
-    elGrade.insertAdjacentHTML('beforeend', lote.map((it) => htmlCardLuta(it, ctx)).join(''));
+    if (visao === 'lista') elGrade.querySelector('tbody').insertAdjacentHTML('beforeend', lote.map(htmlLinhaLuta).join(''));
+    else elGrade.insertAdjacentHTML('beforeend', lote.map((it) => htmlCardLuta(it, ctx)).join(''));
     mostrados += lote.length;
   }
 
@@ -194,7 +221,18 @@ export async function telaBiblioteca(container) {
     }
     atualizar();
   });
+  ligarAlternarVisao(container.querySelector('.alternar-visao'), 'biblioteca', (v) => {
+    visao = v;
+    atualizar();
+  });
+  ligarTecladoLinhas(elGrade);
   elGrade.addEventListener('click', (e) => {
+    const ordem = e.target.closest('[data-ordem]')?.dataset.ordem;
+    if (ordem) {
+      estado.ordem = ordem;
+      $('.ordem').value = ordem;
+      return atualizar();
+    }
     const id = e.target.closest('[data-luta]')?.dataset.luta;
     const item = id && itens.find((i) => i.luta.id === id);
     if (item) abrirDetalheLuta(item, ctx);

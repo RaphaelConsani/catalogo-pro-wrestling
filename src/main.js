@@ -14,6 +14,7 @@ import './estilos/biblioteca.css';
 import './estilos/backlog.css';
 import './estilos/dashboards.css';
 import './estilos/dados.css';
+import './estilos/lista.css';
 
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';

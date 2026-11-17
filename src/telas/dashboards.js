@@ -4,6 +4,9 @@ import {
   distribuicaoNotas, destaques, calendario, atraso, formatarDias,
 } from '../db/estatisticas.js';
 import { htmlCardLuta } from '../componentes/card-luta.js';
+import { htmlTabelaLutas, ligarTecladoLinhas } from '../componentes/tabela-lutas.js';
+import { lerVisao, gravarVisao, htmlAlternarVisao } from '../componentes/visao.js';
+import { ordenar } from './biblioteca.js';
 import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { esc, plural, formatarData } from '../util/texto.js';
@@ -377,19 +380,38 @@ export async function telaDashboards(container) {
     const el = elConteudo.querySelector('.dash-destaques');
     const dados = destaques(lista);
     let todos = false;
+    let ordem = null; // null = ordem padrão (maior nota, depois assistida por último)
     const desenhar = () => {
-      const mostrar = todos ? dados : dados.slice(0, DESTAQUES_INICIAL);
+      const visao = lerVisao('destaques');
+      const ordenados = ordem ? ordenar(dados, ordem) : dados;
+      const mostrar = todos ? ordenados : ordenados.slice(0, DESTAQUES_INICIAL);
       el.innerHTML = `
         <div class="dash-secao-topo">
           <div><h2 class="dash-titulo-ouro">★ 5 Stars e acima de 4½</h2><small>nota mais recente · de 4.50 pra cima</small></div>
-          <span class="contador">${plural(dados.length, 'luta', 'lutas')}</span>
+          <span class="dash-destaques-acoes">
+            <span class="contador">${plural(dados.length, 'luta', 'lutas')}</span>
+            ${dados.length ? htmlAlternarVisao(visao) : ''}
+          </span>
         </div>
-        ${dados.length ? `<div class="grade-lutas">${mostrar.map((i) => htmlCardLuta(i, ctx)).join('')}</div>
+        ${dados.length ? `<div class="grade-lutas${visao === 'lista' ? ' em-lista' : ''}">
+            ${visao === 'lista' ? htmlTabelaLutas(mostrar, ordem ?? 'nota_desc') : mostrar.map((i) => htmlCardLuta(i, ctx)).join('')}
+          </div>
           ${dados.length > DESTAQUES_INICIAL ? `<button type="button" class="botao botao-fantasma botao-pequeno dash-mais" data-destaques-todos>
             ${todos ? 'Mostrar menos' : `Mostrar todas (${dados.length})`}</button>` : ''}`
         : '<p class="dash-nada">Nenhuma luta com 4.50 ★ ou mais.</p>'}`;
     };
+    ligarTecladoLinhas(el);
     el.addEventListener('click', (e) => {
+      const v = e.target.closest('[data-visao]')?.dataset.visao;
+      if (v) {
+        gravarVisao('destaques', v);
+        return desenhar();
+      }
+      const o = e.target.closest('[data-ordem]')?.dataset.ordem;
+      if (o) {
+        ordem = o;
+        return desenhar();
+      }
       if (e.target.closest('[data-destaques-todos]')) {
         todos = !todos;
         return desenhar();

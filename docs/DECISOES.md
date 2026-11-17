@@ -122,3 +122,12 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Empresas com nome completo e cor sugeridos (sem dourado; AEW em prata `#cbd5e1`).
 - Nomes: espaços sobrando removidos, maiúsculas/minúsculas unificadas, erros de digitação corrigidos; nomes antigos de um mesmo wrestler unificados no nome atual. Eventos repetidos com/sem prefixo da empresa unificados.
 - Equipes não são criadas na importação.
+
+## Revisão final · Cards ou lista
+
+- Biblioteca, Backlog, página do wrestler e destaques dos Dashboards ganham a opção de ver em **cards** (como já era) ou **lista** (tabela compacta).
+- Cada tela **lembra a sua escolha**, mesmo depois de fechar o app.
+- Biblioteca (e wrestler/destaques): colunas **Nota, Confronto, Empresa, Evento, Data, Tipo, Assistida em**.
+- Backlog: **tabela corrida** (sem agrupar por evento), com o evento numa coluna e as ações em cada linha.
+- Celular: **esconde colunas**, ficando Nota, Confronto e Data.
+- Clicar no **cabeçalho ordena** pela coluna (de novo inverte); o seletor de ordem acompanha.
