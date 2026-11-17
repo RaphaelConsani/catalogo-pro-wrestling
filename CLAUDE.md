@@ -32,11 +32,12 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 2 · Cadastros
 - [x] Etapa 3 · Registro de luta
 - [x] Etapa 4 · Biblioteca e página do wrestler
-  - As lutas de teste estão no Brave dele: lembrar de apagar antes do uso real (`indexedDB.deleteDatabase("catalogo-pro-wrestling")` no console).
+  - As lutas de teste estão no Brave dele, mas só no endereço local (localhost). O app publicado tem banco próprio e começa vazio.
 - [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
 - [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
 - [x] Etapa 7 · Dados (tela em `src/telas/dados.js`, backup e lembrete em `src/db/backup.js`, Excel em `src/db/excel.js`, faixa em `src/componentes/lembrete-backup.js`; SheetJS sob demanda)
-- [ ] Etapas 8 e 9
+- [ ] **Etapa 8 · Publicação — site no ar, falta o usuário instalar no Brave.** Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push continua precisando de confirmação do usuário.
+- [ ] Etapa 9
 
 ### Pra revisão final (usuário)
 
@@ -49,6 +50,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - ECharts: cores passadas pra ele precisam da sintaxe antiga com vírgulas (`rgba(r, g, b, a)`); a sintaxe nova do CSS vira preto. `coresTema()` já cuida disso.
 - O build ainda avisa que o pedaço dos gráficos (~600 kB) passou de 500 kB, mas ele só carrega sob demanda; o app principal ficou com ~200 kB.
 - O Início ainda abre a edição ao clicar numa luta (decidido na etapa 3); o detalhe em painel está em `src/componentes/detalhe-luta.js`.
+- O fluxo de publicação usa actions na versão v4 (avisos de Node 20 descontinuado no GitHub); atualizar quando houver versão nova estável.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 
 ## Como rodar
