@@ -1,0 +1,37 @@
+/* Tokens do tema escuro. Neon ciano = interface; dourado = só lutas 5★ e acima de 4½. */
+:root {
+  color-scheme: dark;
+
+  --fundo: #0a0b10;
+  --fundo-elevado: #12141c;
+  --superficie: #181b25;
+  --superficie-2: #20242f;
+  --borda: #2a2f3d;
+  --borda-forte: #3a4152;
+
+  --texto: #eef1f7;
+  --texto-suave: #a3abbd;
+  --texto-fraco: #6b7386;
+
+  --neon: #22e6ff;
+  --neon-forte: #7ef2ff;
+  --neon-brilho: 0 0 12px rgb(34 230 255 / 0.45), 0 0 32px rgb(34 230 255 / 0.15);
+  --neon-fundo: rgb(34 230 255 / 0.08);
+
+  --ouro: #f5c542;
+  --ouro-claro: #ffe08a;
+  --ouro-escuro: #b8860b;
+  --ouro-gradiente: linear-gradient(135deg, #ffe08a 0%, #f5c542 40%, #b8860b 100%);
+  --ouro-brilho: 0 0 14px rgb(245 197 66 / 0.5), 0 0 40px rgb(245 197 66 / 0.18);
+
+  --perigo: #ff4d6d;
+  --sucesso: #39d98a;
+
+  --fonte-titulo: 'Anton', 'Impact', sans-serif;
+  --fonte-texto: 'Barlow', system-ui, sans-serif;
+
+  --raio: 12px;
+  --raio-pequeno: 8px;
+  --altura-topo: 68px;
+  --largura-max: 1280px;
+}

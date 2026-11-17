@@ -1,0 +1,203 @@
+/* Barra superior */
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: var(--altura-topo);
+  padding: 0 32px;
+  background: rgb(10 11 16 / 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--borda);
+}
+
+.topo::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon) 30%, var(--neon) 70%, transparent);
+  opacity: 0.35;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--texto);
+  flex-shrink: 0;
+}
+
+.marca-icone {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--neon-fundo);
+  border: 1px solid rgb(34 230 255 / 0.4);
+  color: var(--neon);
+  font-size: 18px;
+  text-shadow: var(--neon-brilho);
+}
+
+.marca-texto {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--fonte-titulo);
+  font-size: 20px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.marca-sub {
+  font-family: var(--fonte-texto);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--neon);
+  margin-top: 3px;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.menu a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 14px;
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.menu a:hover {
+  color: var(--texto);
+}
+
+.menu a.ativo {
+  color: var(--neon);
+  text-shadow: var(--neon-brilho);
+}
+
+.menu a.ativo::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--neon);
+  box-shadow: var(--neon-brilho);
+}
+
+/* "Nova luta" em destaque como ação principal */
+.menu a.acao {
+  height: auto;
+  margin: 0 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgb(34 230 255 / 0.5);
+  background: var(--neon-fundo);
+  color: var(--neon);
+}
+
+.menu a.acao:hover,
+.menu a.acao.ativo {
+  background: var(--neon);
+  color: var(--fundo);
+  text-shadow: none;
+  box-shadow: var(--neon-brilho);
+}
+
+.menu a.acao.ativo::after {
+  display: none;
+}
+
+/* Área de conteúdo */
+.conteudo {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Cabeçalho de tela e estado vazio (provisórios até cada etapa) */
+.tela-cabecalho {
+  margin-bottom: 32px;
+}
+
+.tela-rotulo {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 8px;
+}
+
+.tela-titulo {
+  font-size: clamp(40px, 6vw, 72px);
+}
+
+.tela-descricao {
+  margin: 12px 0 0;
+  max-width: 640px;
+  color: var(--texto-suave);
+  font-size: 18px;
+}
+
+.vazio {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 320px;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  background: linear-gradient(180deg, var(--fundo-elevado), transparent);
+  color: var(--texto-fraco);
+}
+
+.vazio-icone {
+  font-size: 40px;
+  opacity: 0.6;
+}
+
+.vazio strong {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 18px;
+}
+
+@media (max-width: 720px) {
+  .topo {
+    gap: 16px;
+    padding: 0 16px;
+  }
+  .marca-texto {
+    display: none;
+  }
+  .conteudo {
+    padding: 24px 16px 64px;
+  }
+}
