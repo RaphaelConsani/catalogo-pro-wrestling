@@ -88,3 +88,8 @@ if (aviso) {
 
 // Abre o banco (cria e grava os dados iniciais na primeira vez).
 db.open().catch((erro) => console.error('Erro ao abrir o banco:', erro));
+
+// App instalável e offline: service worker só na versão publicada (no "npm run dev" atrapalharia).
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch((erro) => console.error('Erro ao registrar o service worker:', erro));
+}

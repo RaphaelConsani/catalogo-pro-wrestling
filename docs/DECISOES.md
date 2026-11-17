@@ -100,3 +100,10 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Lembrete de 7 dias sem backup: **faixa no topo** de todas as telas com "Exportar agora"; some ao exportar. O ✕ esconde **até o dia seguinte**.
 - Sem nenhum backup feito, os 7 dias contam **a partir da 1ª luta registrada**; app vazio não mostra lembrete.
 - Excel: aba **Lutas** (uma linha por luta: evento, data, empresa, lados, vencedor, método, título, duração, nota mais recente, 1ª visualização) e aba **Visualizações** (todo o histórico).
+
+## Etapa 8 · Publicação
+
+- Commits continuam com o e-mail pessoal (o usuário não vê problema; projeto sem dados sensíveis).
+- Repositório **catalogo-pro-wrestling** (público) → app em `https://<usuário>.github.io/catalogo-pro-wrestling/`.
+- Publicação **automática a cada push** (GitHub Actions → GitHub Pages).
+- App **instalável e funcionando offline**: manifesto com nome, ícone e janela própria + service worker.
