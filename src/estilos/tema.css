@@ -13,10 +13,11 @@
   --texto-suave: #a3abbd;
   --texto-fraco: #6b7386;
 
-  --neon: #22e6ff;
-  --neon-forte: #7ef2ff;
-  --neon-brilho: 0 0 12px rgb(34 230 255 / 0.45), 0 0 32px rgb(34 230 255 / 0.15);
-  --neon-fundo: rgb(34 230 255 / 0.08);
+  /* Cor de acento: definida por [data-acento] no <html> (ciano | roxo | vermelho) */
+  --neon-rgb: 34 230 255;
+  --neon: rgb(var(--neon-rgb));
+  --neon-brilho: 0 0 12px rgb(var(--neon-rgb) / 0.45), 0 0 32px rgb(var(--neon-rgb) / 0.15);
+  --neon-fundo: rgb(var(--neon-rgb) / 0.08);
 
   --ouro: #f5c542;
   --ouro-claro: #ffe08a;
@@ -34,4 +35,14 @@
   --raio-pequeno: 8px;
   --altura-topo: 68px;
   --largura-max: 1280px;
+}
+
+/* Variações de acento (o ciano é o padrão acima) */
+:root[data-acento='roxo'] {
+  --neon-rgb: 168 85 255; /* #a855ff */
+}
+
+:root[data-acento='vermelho'] {
+  --neon-rgb: 255 59 92; /* #ff3b5c */
+  --perigo: #ff8a3d; /* laranja, pra não confundir erro/excluir com o acento */
 }

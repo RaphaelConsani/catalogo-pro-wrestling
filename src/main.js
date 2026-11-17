@@ -11,6 +11,7 @@ import './estilos/layout.css';
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';
 import { telaProvisoria } from './telas/provisoria.js';
+import { montarSeletorAcento } from './componentes/seletor-acento.js';
 
 const menu = [
   { caminho: '/', nome: 'Início' },
@@ -75,6 +76,7 @@ function marcarAtivo(caminho) {
   }
 }
 
+montarSeletorAcento(document.getElementById('seletor-acento'));
 iniciarRouter(document.getElementById('app'), marcarAtivo);
 
 // Abre o banco (cria e grava os dados iniciais na primeira vez).

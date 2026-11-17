@@ -6,6 +6,13 @@
     <meta name="theme-color" content="#0a0b10" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Catálogo de Pro Wrestling</title>
+    <script>
+      // Aplica a cor de acento salva antes de pintar a página (evita piscar em ciano).
+      try {
+        var a = localStorage.getItem('corAcento');
+        if (a) document.documentElement.dataset.acento = a;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <header class="topo">
@@ -14,6 +21,7 @@
         <span class="marca-texto">Catálogo<span class="marca-sub">Pro Wrestling</span></span>
       </a>
       <nav class="menu" id="menu" aria-label="Navegação principal"></nav>
+      <div class="acento" id="seletor-acento" role="group" aria-label="Cor de destaque"></div>
     </header>
     <main class="conteudo" id="app"></main>
     <script type="module" src="/src/main.js"></script>

@@ -39,7 +39,7 @@
   height: 36px;
   border-radius: 10px;
   background: var(--neon-fundo);
-  border: 1px solid rgb(34 230 255 / 0.4);
+  border: 1px solid rgb(var(--neon-rgb) / 0.4);
   color: var(--neon);
   font-size: 18px;
   text-shadow: var(--neon-brilho);
@@ -115,7 +115,7 @@
   margin: 0 6px;
   padding: 8px 16px;
   border-radius: 999px;
-  border: 1px solid rgb(34 230 255 / 0.5);
+  border: 1px solid rgb(var(--neon-rgb) / 0.5);
   background: var(--neon-fundo);
   color: var(--neon);
 }
@@ -200,4 +200,37 @@
   .conteudo {
     padding: 24px 16px 64px;
   }
+}
+
+/* Seletor de cor de destaque (canto direito do topo) */
+.acento {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.acento-opcao {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--cor);
+  background-clip: padding-box;
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.acento-opcao:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.acento-opcao[aria-pressed='true'] {
+  opacity: 1;
+  border-color: var(--fundo);
+  box-shadow: 0 0 0 2px var(--cor), 0 0 12px var(--cor);
 }
