@@ -32,11 +32,11 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 3 · Registro de luta
 - [x] Etapa 4 · Biblioteca e página do wrestler
   - As lutas de teste estão no Brave dele: lembrar de apagar antes do uso real (`indexedDB.deleteDatabase("catalogo-pro-wrestling")` no console).
-- [ ] Etapas 5 a 9
+- [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
+- [ ] Etapas 6 a 9
 
 ### Pendências e lembretes pra próximas etapas
 
-- Etapa 5: o formulário da luta já aceita pré-preenchimento — `montarFormulario(container, { inicial, aoSalvar })` em `src/telas/luta/formulario.js`; usar isso no "assisti" do backlog.
 - Dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ e acima de 4½ — inclusive nos gráficos (use o neon).
 - Etapa 6: `src/db/catalogo.js` (`carregarCatalogo`) já devolve as lutas enriquecidas com nota mais recente e 1ª visualização; `src/util/graficos.js` tem o ECharts configurado (importando só os módulos usados — acrescente os novos tipos de gráfico lá).
 - Build avisa que o JS passou de 500 kB (ECharts). Na etapa 6, considerar carregar os gráficos sob demanda (`import()` dinâmico) — perguntar antes.

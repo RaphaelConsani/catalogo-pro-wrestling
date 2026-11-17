@@ -36,8 +36,13 @@ export async function telaEditarLuta(container, { id }) {
 //   inicial              -> dados pra pré-preencher uma luta nova (usado pelo backlog na etapa 5)
 //   visualizacaoInicial  -> data/plataforma pré-preenchidas na 1ª visualização de uma luta nova
 //   aoSalvar(luta)       -> substitui o comportamento padrão depois de salvar
-export async function montarFormulario(container, { luta = null, visualizacoes = [], inicial = null, visualizacaoInicial = {}, aoSalvar = null }) {
+//   rotulo               -> texto acima do título (ex.: "Do backlog")
+//   modo: 'backlog'      -> só evento, tipo, estipulações e lados; não grava a luta,
+//                           entrega os dados pra aoSalvar. Vai dentro do painel (sem cabeçalho).
+//   aoExcluir()          -> no modo backlog, mostra "Remover do backlog"
+export async function montarFormulario(container, { luta = null, visualizacoes = [], inicial = null, visualizacaoInicial = {}, aoSalvar = null, rotulo = 'Registro', modo = 'luta', aoExcluir = null }) {
   const editando = Boolean(luta);
+  const backlog = modo === 'backlog';
   const base = luta ?? inicial ?? {};
 
   // ---------- Dados de apoio ----------
@@ -67,11 +72,11 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
 
   // ---------- Estrutura ----------
   container.innerHTML = `
-    <section class="tela-cabecalho">
-      ${editando ? '<a class="voltar voltar-historico" href="#/">‹ Voltar</a>' : '<span class="tela-rotulo">Registro</span>'}
+    ${backlog ? '' : `<section class="tela-cabecalho">
+      ${editando ? '<a class="voltar voltar-historico" href="#/">‹ Voltar</a>' : `<span class="tela-rotulo">${esc(rotulo)}</span>`}
       <h1 class="tela-titulo">${editando ? 'Editar luta' : 'Nova luta'}</h1>
-    </section>
-    <form class="form-luta" novalidate>
+    </section>`}
+    <form class="form-luta${backlog ? ' form-backlog' : ''}" novalidate>
       <section class="secao" data-secao="evento">
         <h2 class="secao-titulo"><span>1</span> Evento</h2>
         <div class="secao-corpo evento-campo"></div>
@@ -137,13 +142,16 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
 
       <div class="barra-salvar">
         ${editando ? '<button type="button" class="botao botao-perigo-fantasma excluir-luta">Excluir luta</button>' : ''}
+        ${backlog && aoExcluir ? '<button type="button" class="botao botao-perigo-fantasma remover-backlog">Remover do backlog</button>' : ''}
         <span class="espaco"></span>
-        <button type="submit" class="botao botao-primario salvar-luta">${editando ? 'Salvar alterações' : 'Salvar luta'}</button>
+        <button type="submit" class="botao botao-primario salvar-luta">${backlog ? (aoExcluir ? 'Salvar alterações' : 'Adicionar ao backlog') : editando ? 'Salvar alterações' : 'Salvar luta'}</button>
       </div>
     </form>`;
 
   const $ = (s) => container.querySelector(s);
   const form = $('.form-luta');
+  // Backlog: resultado, detalhes e visualizações ficam pra quando marcar "assisti".
+  if (backlog) for (const s of ['resultado', 'detalhes', 'visualizacoes']) container.querySelector(`[data-secao="${s}"]`).hidden = true;
   $('.voltar-historico')?.addEventListener('click', (e) => {
     e.preventDefault();
     voltar();
@@ -426,6 +434,22 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     mostrarErroSecao(secao, null);
   }
 
+  function validarRegistro(erros) {
+    if (!estado.resultado) erros.resultado = 'Escolha o resultado.';
+    else if (estado.resultado === 'vitoria' && !estado.metodoVitoriaId) erros.resultado = 'Escolha o método de vitória.';
+
+    const seg = duracaoParaSegundos(elDuracao.value);
+    const link = $('.link').value.trim();
+    if (Number.isNaN(seg)) erros.detalhes = 'Duração inválida. Use mm:ss, com segundos de 00 a 59.';
+    else if (link && !/^https?:\/\/\S+\.\S+/.test(link)) erros.detalhes = 'O link precisa começar com http:// ou https://.';
+
+    if (!estado.visualizacoes.length) erros.visualizacoes = 'Registre pelo menos uma visualização.';
+    else {
+      const i = estado.visualizacoes.findIndex((v) => !v.data || v.nota.valor() == null);
+      if (i >= 0) erros.visualizacoes = `Preencha a data e a nota da ${i + 1}ª visualização.`;
+    }
+  }
+
   function validar() {
     const erros = {};
     if (!estado.evento) erros.evento = 'Escolha o evento.';
@@ -445,19 +469,8 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
         if (repetido) erros.lados = `${ctx.wrestlers.get(repetido)?.nome ?? 'Um wrestler'} aparece mais de uma vez na luta.`;
       }
     }
-    if (!estado.resultado) erros.resultado = 'Escolha o resultado.';
-    else if (estado.resultado === 'vitoria' && !estado.metodoVitoriaId) erros.resultado = 'Escolha o método de vitória.';
-
-    const seg = duracaoParaSegundos(elDuracao.value);
-    const link = $('.link').value.trim();
-    if (Number.isNaN(seg)) erros.detalhes = 'Duração inválida. Use mm:ss, com segundos de 00 a 59.';
-    else if (link && !/^https?:\/\/\S+\.\S+/.test(link)) erros.detalhes = 'O link precisa começar com http:// ou https://.';
-
-    if (!estado.visualizacoes.length) erros.visualizacoes = 'Registre pelo menos uma visualização.';
-    else {
-      const i = estado.visualizacoes.findIndex((v) => !v.data || v.nota.valor() == null);
-      if (i >= 0) erros.visualizacoes = `Preencha a data e a nota da ${i + 1}ª visualização.`;
-    }
+    // No backlog só evento, tipo e lados importam; o resto fica pro "assisti".
+    if (!backlog) validarRegistro(erros);
 
     for (const s of ['evento', 'tipo', 'lados', 'resultado', 'detalhes', 'visualizacoes']) mostrarErroSecao(s, erros[s]);
     const primeiro = container.querySelector('.secao.com-erro');
@@ -471,6 +484,21 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     const botao = $('.salvar-luta');
     if (botao.disabled || !validar()) return;
     botao.disabled = true;
+    if (backlog) {
+      try {
+        await aoSalvar({
+          eventoId: estado.evento.id,
+          tipoMatchId: estado.tipo.id,
+          estipulacoesIds: estipulacoes.filter((x) => estado.estipulacoesIds.has(x.id)).map((x) => x.id),
+          lados: estado.lados.map((l) => ({ equipeId: l.equipeId, wrestlersIds: [...l.wrestlersIds] })),
+        });
+      } catch (erro) {
+        console.error(erro);
+        toast('Não foi possível salvar no backlog.', 'erro');
+        botao.disabled = false;
+      }
+      return;
+    }
     const dados = {
       ...(editando ? { id: luta.id } : {}),
       eventoId: estado.evento.id,
@@ -500,7 +528,7 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
       const tela = document.createElement('div');
       tela.className = 'tela';
       container.replaceWith(tela);
-      await montarFormulario(tela, { inicial: { eventoId: dados.eventoId }, visualizacaoInicial: { data: ultima.data, plataformaId: ultima.plataformaId } });
+      await montarFormulario(tela, { rotulo, inicial: { eventoId: dados.eventoId }, visualizacaoInicial: { data: ultima.data, plataformaId: ultima.plataformaId } });
       window.scrollTo(0, 0);
     } catch (erro) {
       console.error(erro);
@@ -508,6 +536,8 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
       botao.disabled = false;
     }
   });
+
+  $('.remover-backlog')?.addEventListener('click', aoExcluir);
 
   $('.excluir-luta')?.addEventListener('click', async () => {
     const ok = await confirmar({

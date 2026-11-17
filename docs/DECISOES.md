@@ -70,3 +70,10 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Página do wrestler: cabeçalho com números (foto, empresa, total de lutas, nota média, recorde) + lista de lutas + mini gráficos (lutas por ano e nota média por ano, pelo **ano do evento**).
 - Acesso à página do wrestler: nomes clicáveis no detalhe da luta + botão "Ver página" em Cadastros > Wrestlers.
 - Formato da nota em todo o app (cards, detalhe, histórico, filtros, formulário, página do wrestler): **número com ponto e duas casas + ★**, no estilo dos sites de wrestling — `4.25 ★`, `5.00 ★`, `4.50 ★`. Nota 0 continua **DUD**. Substitui o `****¼` (decidido na etapa 4).
+
+## Etapa 5 · Backlog
+
+- Item de luta é cadastrado pela tela Backlog, num painel lateral que **reusa o formulário da luta** mostrando só evento, tipo, estipulações e lados.
+- Item concluído (luta registrada pelo "assisti" ou evento concluído) **some da lista**; fica no banco marcado como concluído.
+- Item de evento inteiro tem **"Registrar luta"** (abre a Nova luta com o evento preenchido) e **"Concluir evento"**; o card mostra quantas lutas daquele evento já foram registradas.
+- Tela **agrupada por evento** (evento inteiro e lutas avulsas do mesmo evento juntos), cards na cor da empresa, com busca e ordem por data do evento ou por data em que foi adicionado.

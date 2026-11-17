@@ -6,6 +6,8 @@ import { plural } from '../util/texto.js';
 const vivo = (r) => !r.excluidoEm;
 const contar = (tabela, filtro) => db.table(tabela).filter((r) => vivo(r) && filtro(r)).count();
 const ladosUsam = (r, f) => (r.lados ?? []).some(f);
+// Item do backlog já concluído não prende o cadastro.
+const contarBacklog = (filtro) => contar('backlog', (r) => !r.concluidoEm && filtro(r));
 
 const REGRAS = {
   empresas: (id) => [
@@ -15,24 +17,24 @@ const REGRAS = {
   ],
   eventos: (id) => [
     [contar('lutas', (r) => r.eventoId === id), 'luta', 'lutas'],
-    [contar('backlog', (r) => r.eventoId === id), 'item do backlog', 'itens do backlog'],
+    [contarBacklog((r) => r.eventoId === id), 'item do backlog', 'itens do backlog'],
   ],
   wrestlers: (id) => [
     [contar('lutas', (r) => (r.wrestlersIds ?? []).includes(id)), 'luta', 'lutas'],
     [contar('equipes', (r) => (r.membrosIds ?? []).includes(id)), 'equipe', 'equipes'],
-    [contar('backlog', (r) => ladosUsam(r, (l) => (l.wrestlersIds ?? []).includes(id))), 'item do backlog', 'itens do backlog'],
+    [contarBacklog((r) => ladosUsam(r, (l) => (l.wrestlersIds ?? []).includes(id))), 'item do backlog', 'itens do backlog'],
   ],
   equipes: (id) => [
     [contar('lutas', (r) => ladosUsam(r, (l) => l.equipeId === id)), 'luta', 'lutas'],
-    [contar('backlog', (r) => ladosUsam(r, (l) => l.equipeId === id)), 'item do backlog', 'itens do backlog'],
+    [contarBacklog((r) => ladosUsam(r, (l) => l.equipeId === id)), 'item do backlog', 'itens do backlog'],
   ],
   tiposMatch: (id) => [
     [contar('lutas', (r) => r.tipoMatchId === id), 'luta', 'lutas'],
-    [contar('backlog', (r) => r.tipoMatchId === id), 'item do backlog', 'itens do backlog'],
+    [contarBacklog((r) => r.tipoMatchId === id), 'item do backlog', 'itens do backlog'],
   ],
   estipulacoes: (id) => [
     [contar('lutas', (r) => (r.estipulacoesIds ?? []).includes(id)), 'luta', 'lutas'],
-    [contar('backlog', (r) => (r.estipulacoesIds ?? []).includes(id)), 'item do backlog', 'itens do backlog'],
+    [contarBacklog((r) => (r.estipulacoesIds ?? []).includes(id)), 'item do backlog', 'itens do backlog'],
   ],
   titulos: (id) => [[contar('lutas', (r) => r.tituloId === id), 'luta', 'lutas']],
   plataformas: (id) => [[contar('visualizacoes', (r) => r.plataformaId === id), 'visualização', 'visualizações']],

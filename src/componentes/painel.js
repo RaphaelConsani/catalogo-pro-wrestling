@@ -10,13 +10,14 @@ export function fecharPainel() {
   setTimeout(() => raiz.remove(), 220);
 }
 
-export function abrirPainel({ titulo, subtitulo = '', conteudo, rodape }) {
+// largo: painel mais largo, pra formulários com lados lado a lado.
+export function abrirPainel({ titulo, subtitulo = '', conteudo, rodape, largo = false }) {
   fecharPainel();
   const raiz = document.createElement('div');
   raiz.className = 'painel-raiz';
   raiz.innerHTML = `
     <div class="painel-fundo" data-fechar></div>
-    <aside class="painel" role="dialog" aria-modal="true" aria-labelledby="painel-titulo">
+    <aside class="painel${largo ? ' painel-largo' : ''}" role="dialog" aria-modal="true" aria-labelledby="painel-titulo">
       <header class="painel-topo">
         <div>
           ${subtitulo ? `<span class="painel-subtitulo"></span>` : ''}
