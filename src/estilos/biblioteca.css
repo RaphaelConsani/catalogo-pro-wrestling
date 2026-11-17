@@ -1,0 +1,579 @@
+/* ---------- Barra e filtros ---------- */
+.biblioteca-barra .busca {
+  flex: 1;
+  max-width: none;
+}
+
+.biblioteca-barra .ordem {
+  width: auto;
+  min-width: 210px;
+}
+
+.painel-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-elevado);
+}
+
+.painel-filtros .campo-entrada {
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 15px;
+}
+
+.filtro-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: end;
+  min-height: 40px;
+  color: var(--texto-suave);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filtro-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--neon);
+}
+
+.filtros-ativos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.filtros-ativos:empty {
+  display: none;
+}
+
+.limpar-filtros {
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--neon);
+  font: 700 13px/1 var(--fonte-texto);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.biblioteca-contador {
+  margin: 0 0 16px;
+}
+
+.sentinela {
+  height: 1px;
+}
+
+/* ---------- Card tipográfico da luta ---------- */
+.grade-lutas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 16px;
+}
+
+.grade-lutas > .vazio {
+  grid-column: 1 / -1;
+}
+
+.card-luta {
+  --cor-empresa: var(--borda-forte);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 190px;
+  padding: 18px 20px;
+  overflow: hidden;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--cor-empresa);
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--cor-empresa) 22%, transparent), transparent 60%),
+    var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card-luta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.45), 0 0 26px color-mix(in srgb, var(--cor-empresa) 25%, transparent);
+}
+
+.card-luta-topo {
+  color: color-mix(in srgb, var(--cor-empresa) 55%, var(--texto-suave));
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 90px;
+}
+
+.card-luta:not(.cinco-estrelas) .card-luta-topo {
+  padding-right: 0;
+}
+
+.card-luta-confronto {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.card-luta-lado.venceu::after {
+  content: ' ✓';
+  color: var(--neon);
+  font-size: 0.7em;
+  vertical-align: middle;
+}
+
+.card-luta-vs {
+  margin: 4px 0;
+  color: var(--texto-fraco);
+  font-family: var(--fonte-texto);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.card-luta-titulo {
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.card-luta-rodape {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.card-luta-detalhes {
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.card-luta-nota {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.card-luta-nota strong {
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--neon);
+}
+
+.card-luta.nota-alta .card-luta-nota strong {
+  color: var(--ouro);
+  text-shadow: var(--ouro-brilho);
+}
+
+/* ---------- 5 estrelas: borda dourada com brilho que gira devagar ---------- */
+@property --giro {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes giro {
+  to {
+    --giro: 360deg;
+  }
+}
+
+.card-luta.cinco-estrelas {
+  border: 2px solid transparent;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(245 197 66 / 0.16), transparent 60%) padding-box,
+    linear-gradient(var(--superficie), var(--superficie)) padding-box,
+    conic-gradient(from var(--giro), var(--ouro-escuro), var(--ouro-claro) 12%, var(--ouro) 20%, var(--ouro-escuro) 40%,
+      var(--ouro-escuro) 60%, var(--ouro-claro) 72%, var(--ouro) 80%, var(--ouro-escuro)) border-box;
+  box-shadow: var(--ouro-brilho);
+  animation: giro 6s linear infinite;
+}
+
+.card-luta.cinco-estrelas:hover {
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.45), 0 0 40px rgb(245 197 66 / 0.35);
+}
+
+.selo-cinco {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ouro-gradiente);
+  color: #1a1204;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgb(245 197 66 / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-luta.cinco-estrelas {
+    animation: none;
+  }
+}
+
+/* ---------- Detalhe da luta (painel) ---------- */
+.detalhe-luta {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.detalhe-nota {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+}
+
+.detalhe-nota strong {
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--neon);
+}
+
+.detalhe-nota small {
+  flex-basis: 100%;
+  color: var(--texto-fraco);
+}
+
+.detalhe-nota.alta strong {
+  color: var(--ouro);
+  text-shadow: var(--ouro-brilho);
+}
+
+.detalhe-lados {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detalhe-lado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda);
+  background: var(--superficie);
+}
+
+.detalhe-lado.venceu {
+  border-color: rgb(var(--neon-rgb) / 0.6);
+  background: rgb(var(--neon-rgb) / 0.07);
+}
+
+.detalhe-venceu {
+  color: var(--neon);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.detalhe-equipe {
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.detalhe-wrestlers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.detalhe-wrestlers a {
+  color: var(--texto);
+  font-size: 17px;
+  font-weight: 600;
+  border-bottom: 1px solid rgb(var(--neon-rgb) / 0.4);
+}
+
+.detalhe-wrestlers a:hover {
+  color: var(--neon);
+  border-color: var(--neon);
+}
+
+.detalhe-vs {
+  align-self: center;
+  color: var(--texto-fraco);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.detalhe-info {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.detalhe-info dt {
+  color: var(--texto-fraco);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+
+.detalhe-info dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.detalhe-info small {
+  color: var(--texto-suave);
+}
+
+.detalhe-obs h3,
+.detalhe-historico h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.detalhe-historico h3 span {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  font-family: var(--fonte-texto);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detalhe-obs p {
+  margin: 0;
+  color: var(--texto-suave);
+  white-space: pre-wrap;
+}
+
+.detalhe-historico ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detalhe-historico li {
+  display: grid;
+  grid-template-columns: 34px 96px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--raio-pequeno);
+  background: var(--superficie);
+  font-size: 15px;
+}
+
+.detalhe-historico li.recente {
+  box-shadow: 0 0 0 1px rgb(var(--neon-rgb) / 0.4) inset;
+}
+
+.hist-ordem {
+  color: var(--texto-fraco);
+  font-weight: 700;
+}
+
+.hist-nota {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hist-nota strong {
+  color: var(--neon);
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.hist-nota.alta strong {
+  color: var(--ouro);
+}
+
+.hist-plataforma {
+  color: var(--texto-suave);
+}
+
+/* ---------- Página do wrestler ---------- */
+.wrestler-cabecalho {
+  --cor-empresa: var(--borda-forte);
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 28px;
+}
+
+.wrestler-foto {
+  width: 180px;
+  flex-shrink: 0;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--cor-empresa);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--cor-empresa) 22%, transparent);
+}
+
+.wrestler-foto .moldura-marcador {
+  font-size: 64px;
+  color: color-mix(in srgb, var(--cor-empresa) 70%, white);
+}
+
+.wrestler-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0 0;
+  color: var(--texto-suave);
+}
+
+.etiqueta-empresa {
+  padding: 2px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-empresa);
+  background: color-mix(in srgb, var(--cor-empresa) 15%, transparent);
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.numero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-elevado);
+}
+
+.numero strong {
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.numero strong small {
+  margin: 0 6px 0 2px;
+  color: var(--texto-fraco);
+  font-size: 20px;
+}
+
+.numero > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.numero.alta strong {
+  color: var(--ouro);
+  text-shadow: var(--ouro-brilho);
+}
+
+.graficos-wrestler {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.grafico-caixa {
+  padding: 20px 22px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-elevado);
+}
+
+.grafico-caixa h2 {
+  font-size: 22px;
+}
+
+.grafico-caixa small {
+  color: var(--texto-fraco);
+}
+
+.grafico {
+  height: 220px;
+  margin-top: 12px;
+}
+
+.wrestler-lutas .barra-ferramentas h2 {
+  margin: 0;
+}
+
+.wrestler-lutas .ordem {
+  width: auto;
+  min-width: 210px;
+}
+
+@media (max-width: 720px) {
+  .wrestler-cabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .grade-lutas {
+    grid-template-columns: 1fr;
+  }
+  .biblioteca-barra .ordem {
+    min-width: 0;
+    flex: 1;
+  }
+}

@@ -30,13 +30,17 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 1 · Base do projeto (commit `9bae251`) + seletor de cor de destaque (commit `64ebc26`)
 - [x] Etapa 2 · Cadastros
 - [x] Etapa 3 · Registro de luta
-- [ ] Etapas 4 a 9
+- [x] Etapa 4 · Biblioteca e página do wrestler
+  - As lutas de teste estão no Brave dele: lembrar de apagar antes do uso real (`indexedDB.deleteDatabase("catalogo-pro-wrestling")` no console).
+- [ ] Etapas 5 a 9
 
 ### Pendências e lembretes pra próximas etapas
 
 - Etapa 5: o formulário da luta já aceita pré-preenchimento — `montarFormulario(container, { inicial, aoSalvar })` em `src/telas/luta/formulario.js`; usar isso no "assisti" do backlog.
-- Etapa 4: a lista "Últimas lutas registradas" do Início (`src/telas/inicio.js`) é a base do Início definitivo; a edição está em `#/luta/<id>/editar`.
-- Etapa 4: dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ e acima de 4½.
+- Dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ e acima de 4½ — inclusive nos gráficos (use o neon).
+- Etapa 6: `src/db/catalogo.js` (`carregarCatalogo`) já devolve as lutas enriquecidas com nota mais recente e 1ª visualização; `src/util/graficos.js` tem o ECharts configurado (importando só os módulos usados — acrescente os novos tipos de gráfico lá).
+- Build avisa que o JS passou de 500 kB (ECharts). Na etapa 6, considerar carregar os gráficos sob demanda (`import()` dinâmico) — perguntar antes.
+- O Início ainda abre a edição ao clicar numa luta (decidido na etapa 3); o detalhe em painel está em `src/componentes/detalhe-luta.js`.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 
 ## Como rodar

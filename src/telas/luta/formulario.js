@@ -17,6 +17,9 @@ const RESULTADOS_SEM_VENCEDOR = [
 
 const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR');
 
+// Depois de editar/excluir: volta pra tela de onde veio (Início, Biblioteca, página do wrestler).
+const voltar = () => (history.length > 1 ? history.back() : (location.hash = '#/'));
+
 export const telaNovaLuta = (container) => montarFormulario(container, {});
 
 export async function telaEditarLuta(container, { id }) {
@@ -65,7 +68,7 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
   // ---------- Estrutura ----------
   container.innerHTML = `
     <section class="tela-cabecalho">
-      ${editando ? '<a class="voltar" href="#/">‹ Início</a>' : '<span class="tela-rotulo">Registro</span>'}
+      ${editando ? '<a class="voltar voltar-historico" href="#/">‹ Voltar</a>' : '<span class="tela-rotulo">Registro</span>'}
       <h1 class="tela-titulo">${editando ? 'Editar luta' : 'Nova luta'}</h1>
     </section>
     <form class="form-luta" novalidate>
@@ -141,6 +144,10 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
 
   const $ = (s) => container.querySelector(s);
   const form = $('.form-luta');
+  $('.voltar-historico')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    voltar();
+  });
 
   // ---------- 1. Evento ----------
   const seletorEvento = await criarSeletorEvento({
@@ -484,7 +491,7 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
       if (aoSalvar) return aoSalvar(salva);
       if (editando) {
         toast('Luta atualizada');
-        location.hash = '#/';
+        voltar();
         return;
       }
       toast('Luta registrada');
@@ -512,7 +519,7 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     if (!ok) return;
     await excluirLuta(luta.id);
     toast('Luta excluída');
-    location.hash = '#/';
+    voltar();
   });
 
   // ---------- Render inicial ----------

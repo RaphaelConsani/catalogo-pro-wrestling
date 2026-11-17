@@ -46,7 +46,7 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 
 ## Etapa 3 · Registro de luta
 
-- Nota: **estrelas + ajuste fino** (clica na estrela pra nota cheia, botões −¼/+¼), com `****¼` e o número (4,25) ao lado.
+- Nota: **estrelas + ajuste fino** (clica na estrela pra nota cheia, botões −¼/+¼), com a nota em número ao lado.
 - Nota 0 é exibida como **DUD**.
 - Duração: sempre `mm:ss`, minutos podem passar de 59 (ex.: `65:30`, até 3 dígitos). **Opcional.**
 - Tipos fixos: número de lados e de wrestlers por lado **exato** (pra luta desigual existe Handicap).
@@ -57,3 +57,16 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Evento pode ser **criado na hora** no formulário (nome, data, empresa; pôster e parceiras depois em Cadastros).
 - Título em disputa: primeiro os da empresa principal e parceiras do evento, depois todos os outros.
 - Pra testar edição nesta etapa: lista de **últimas lutas registradas no Início**, cada uma abrindo a edição (base do Início definitivo).
+
+## Etapa 4 · Biblioteca e página do wrestler
+
+- Card da luta: **só texto, tipográfico** (sem imagens), na cor da empresa.
+- Destaque 5 estrelas: **borda dourada com brilho** que passa devagar + selo "★ 5 STARS". De 4½ pra cima, a nota fica dourada.
+- Filtros: empresa, wrestler, tipo, estipulação, ano do evento, faixa de nota + evento, título em disputa, resultado, plataforma e "assisti mais de uma vez". A busca por texto sempre existe.
+- Filtro de empresa considera **principal + parceiras** (os dashboards continuam usando só a principal).
+- Ordenação padrão: **assistidas por último** (visualização mais recente); dá pra trocar.
+- Carregamento: **rolagem infinita**, 60 cards por vez.
+- Detalhe da luta: **painel lateral**, com histórico de visualizações e botão de editar.
+- Página do wrestler: cabeçalho com números (foto, empresa, total de lutas, nota média, recorde) + lista de lutas + mini gráficos (lutas por ano e nota média por ano, pelo **ano do evento**).
+- Acesso à página do wrestler: nomes clicáveis no detalhe da luta + botão "Ver página" em Cadastros > Wrestlers.
+- Formato da nota em todo o app (cards, detalhe, histórico, filtros, formulário, página do wrestler): **número com ponto e duas casas + ★**, no estilo dos sites de wrestling — `4.25 ★`, `5.00 ★`, `4.50 ★`. Nota 0 continua **DUD**. Substitui o `****¼` (decidido na etapa 4).

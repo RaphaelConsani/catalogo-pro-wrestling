@@ -148,6 +148,7 @@ async function abrirFormulario(def, reg, ctx, aoSalvar) {
   rodape.innerHTML = `
     ${reg ? `<button type="button" class="botao botao-perigo-fantasma excluir">Excluir</button>` : ''}
     <span class="espaco"></span>
+    ${reg && def.tabela === 'wrestlers' ? `<a class="botao botao-fantasma" href="#/wrestler/${reg.id}">Ver página</a>` : ''}
     <button type="button" class="botao botao-fantasma" data-fechar>Cancelar</button>
     <button type="submit" class="botao botao-primario salvar">Salvar</button>`;
   rodape.querySelector('.salvar').setAttribute('form', 'form-cadastro');
