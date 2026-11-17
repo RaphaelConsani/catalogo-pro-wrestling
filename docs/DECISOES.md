@@ -92,3 +92,11 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 ## Forma de trabalho (a partir da etapa 6)
 
 - O Claude valida sozinho funcionamento **e visual** de cada etapa, faz o commit e segue; o usuário revisa tudo numa rodada só no fim. Perguntas de decisão continuam vindo antes de implementar. Etapas 8 (comandos no GitHub) e 9 (leitura das colunas) continuam precisando do usuário.
+
+## Etapa 7 · Dados
+
+- Tela própria **"Dados"** no menu: exportar backup JSON, importar backup, exportar Excel e data do último backup.
+- Importar backup **substitui tudo**, depois de mostrar o resumo do arquivo (quantidades e data do backup) e pedir confirmação. Mesclar fica pra fase 2.
+- Lembrete de 7 dias sem backup: **faixa no topo** de todas as telas com "Exportar agora"; some ao exportar. O ✕ esconde **até o dia seguinte**.
+- Sem nenhum backup feito, os 7 dias contam **a partir da 1ª luta registrada**; app vazio não mostra lembrete.
+- Excel: aba **Lutas** (uma linha por luta: evento, data, empresa, lados, vencedor, método, título, duração, nota mais recente, 1ª visualização) e aba **Visualizações** (todo o histórico).

@@ -607,6 +607,7 @@ input[type='date'].campo-entrada::-webkit-calendar-picker-indicator {
 .dialogo p {
   margin: 12px 0 24px;
   color: var(--texto-suave);
+  white-space: pre-line;
 }
 
 .dialogo-acoes {

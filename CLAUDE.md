@@ -35,11 +35,13 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
   - As lutas de teste estão no Brave dele: lembrar de apagar antes do uso real (`indexedDB.deleteDatabase("catalogo-pro-wrestling")` no console).
 - [x] Etapa 5 · Backlog (tela em `src/telas/backlog.js`, banco em `src/db/backlog.js`, formulário da luta ganhou `modo: 'backlog'`)
 - [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
-- [ ] Etapas 7 a 9
+- [x] Etapa 7 · Dados (tela em `src/telas/dados.js`, backup e lembrete em `src/db/backup.js`, Excel em `src/db/excel.js`, faixa em `src/componentes/lembrete-backup.js`; SheetJS sob demanda)
+- [ ] Etapas 8 e 9
 
 ### Pra revisão final (usuário)
 
 - **Etapa 6 · Dashboards.** Olhar: a tela inteira, os filtros de ano e empresa, o mínimo do ranking, as setas do calendário, o dourado nos destaques e a troca de cor de destaque. Escolhas do Claude: linha de números no topo (lutas, nota média, 5★, wrestlers diferentes); contagem de 5★ e barras de 4.50+ da distribuição em dourado; ranking mostra 25 e destaques 12, com "Mostrar todos"; com ano escolhido some "Lutas por ano", com empresa escolhida some "Nota média por empresa".
+- **Etapa 7 · Dados.** Olhar: a tela Dados (três cartões), a faixa do lembrete (aparece com 7 dias sem backup; o ✕ esconde até amanhã), o diálogo de confirmação ao restaurar e a planilha exportada no Excel. Escolhas do Claude: item "Dados" no fim do menu; "Último backup" fica vermelho com 7 dias ou mais; o backup leva também os registros excluídos (pra fase 2); restaurar recarrega o app e conta como backup feito; nomes dos arquivos `catalogo-pro-wrestling-backup-AAAA-MM-DD.json` e `catalogo-pro-wrestling-AAAA-MM-DD.xlsx`; na planilha, as lutas vão em ordem de data do evento e as visualizações em ordem de data.
 
 ### Pendências e lembretes pra próximas etapas
 
