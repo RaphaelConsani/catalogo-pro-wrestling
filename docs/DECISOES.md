@@ -109,3 +109,16 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - App **instalável e funcionando offline**: manifesto com nome, ícone e janela própria + service worker.
 - Endereço continua `raphaelconsani.github.io/catalogo-pro-wrestling` por enquanto (cogitou-se esconder o nome com organização ou outro serviço; ficou pra depois — mudar exige exportar e restaurar o backup no endereço novo).
 - **Push autorizado** sem confirmação a cada vez (17/11/2026). Demais comandos na conta do GitHub continuam pedindo confirmação.
+
+## Etapa 9 · Importação da planilha
+
+- A planilha é convertida por um script (fora do repositório) num **arquivo de backup** do app, salvo fora do projeto; o usuário restaura em Dados → Restaurar backup (o app publicado estava vazio).
+- Aba "Dados" ignorada (são contagens). Abas "Matches" (assistidas) e "Backlog".
+- Uma luta pode ocupar várias linhas (continuação = linha sem data/empresa/evento). Lados por coluna; o "X" entre colunas indica o formato do Backlog.
+- Tipo da luta sai da contagem de lados/wrestlers; o texto da coluna "Tipo" vira estipulação (tabela combinada na conversa de 17/11/2026). Estipulações novas criadas: No Count Out, Tornado, Extreme Rules, Double Dog Collar, Fight Without Honor, FreeFall.
+- Lutas da aba Matches sem data de visualização e sem nota vão pro backlog. Luta com nota e sem data de visualização usa a data do evento.
+- Método de vitória fica **em branco** na importação (o formulário pede ao editar).
+- Itens do Backlog que já estão assistidos em Matches são **pulados**.
+- Empresas com nome completo e cor sugeridos (sem dourado; AEW em prata `#cbd5e1`).
+- Nomes: espaços sobrando removidos, maiúsculas/minúsculas unificadas, erros de digitação corrigidos; nomes antigos de um mesmo wrestler unificados no nome atual. Eventos repetidos com/sem prefixo da empresa unificados.
+- Equipes não são criadas na importação.

@@ -37,7 +37,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 6 · Dashboards (tela em `src/telas/dashboards.js`, cálculos em `src/db/estatisticas.js`, ECharts sob demanda via `import()` de `src/util/graficos.js`)
 - [x] Etapa 7 · Dados (tela em `src/telas/dados.js`, backup e lembrete em `src/db/backup.js`, Excel em `src/db/excel.js`, faixa em `src/componentes/lembrete-backup.js`; SheetJS sob demanda)
 - [x] Etapa 8 · Publicação (instalado no Brave do usuário em 17/11/2026). Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push está autorizado pelo usuário (17/11/2026).
-- [ ] Etapa 9
+- [ ] **Etapa 9 · Importação da planilha — arquivo gerado, falta o usuário restaurar** no app instalado (Dados → Restaurar backup). Arquivo em `~/Documents/catalogo-pro-wrestling-importacao-planilha.json` (24 lutas, 59 itens de backlog). Regras em DECISOES.md; o script de conversão ficou só no scratchpad (tinha correções ligadas aos dados pessoais).
 
 ### Pra revisão final (usuário)
 
