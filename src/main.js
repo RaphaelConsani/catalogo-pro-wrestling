@@ -7,10 +7,13 @@ import '@fontsource/barlow/700.css';
 import './estilos/tema.css';
 import './estilos/base.css';
 import './estilos/layout.css';
+import './estilos/componentes.css';
+import './estilos/cadastros.css';
 
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';
 import { telaProvisoria } from './telas/provisoria.js';
+import { telaCadastros, telaCadastro } from './telas/cadastros/cadastros.js';
 import { montarSeletorAcento } from './componentes/seletor-acento.js';
 
 const menu = [
@@ -52,11 +55,8 @@ definirRota('/backlog', telaProvisoria({
   descricao: 'Lutas e eventos inteiros que ainda vou assistir.',
   etapa: 'Etapa 5 · Backlog',
 }));
-definirRota('/cadastros', telaProvisoria({
-  rotulo: 'Configuração', titulo: 'Cadastros', icone: '⚙',
-  descricao: 'Empresas, eventos, wrestlers, equipes, tipos de match, estipulações, títulos, plataformas e métodos de vitória.',
-  etapa: 'Etapa 2 · Cadastros',
-}));
+definirRota('/cadastros', telaCadastros);
+definirRota('/cadastros/:entidade', telaCadastro);
 definirRota('*', telaProvisoria({
   rotulo: 'Erro', titulo: 'Página não encontrada', icone: '?',
   descricao: 'Esse endereço não existe.',

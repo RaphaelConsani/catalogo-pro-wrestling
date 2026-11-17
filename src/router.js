@@ -20,8 +20,12 @@ export function iniciarRouter(container, aoNavegar) {
     const caminho = caminhoAtual();
     const rota = rotas.find((r) => r.regex.test(caminho)) ?? rotas.find((r) => r.padrao === '*');
     const params = rota.regex.exec(caminho)?.groups ?? {};
-    container.replaceChildren();
-    rota.renderizar(container, params);
+    // Contêiner novo a cada navegação: se uma tela assíncrona terminar depois
+    // que o usuário já saiu dela, ela escreve num elemento desconectado.
+    const tela = document.createElement('div');
+    tela.className = 'tela';
+    container.replaceChildren(tela);
+    Promise.resolve(rota.renderizar(tela, params)).catch((erro) => console.error('Erro ao abrir a tela:', erro));
     window.scrollTo(0, 0);
     aoNavegar?.(caminho);
   };

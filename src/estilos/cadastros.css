@@ -1,0 +1,253 @@
+/* ---------- Painel de blocos ---------- */
+.blocos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.bloco {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 150px;
+  padding: 22px;
+  overflow: hidden;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: linear-gradient(160deg, var(--superficie), var(--fundo-elevado));
+  color: var(--texto);
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.bloco:hover {
+  border-color: rgb(var(--neon-rgb) / 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35), 0 0 0 1px rgb(var(--neon-rgb) / 0.2);
+}
+
+.bloco-icone {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--neon);
+  opacity: 0.12;
+  transition: opacity 0.15s;
+}
+
+.bloco:hover .bloco-icone {
+  opacity: 0.3;
+}
+
+.bloco-numero {
+  margin-top: auto;
+  font-family: var(--fonte-titulo);
+  font-size: 48px;
+  line-height: 1;
+}
+
+.bloco-nome {
+  color: var(--texto-suave);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- Lista de um cadastro ---------- */
+.voltar {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--neon);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.barra-ferramentas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.barra-ferramentas .busca {
+  max-width: 360px;
+}
+
+.contador {
+  flex: 1;
+  color: var(--texto-fraco);
+  font-size: 14px;
+}
+
+/* Cartões (empresas, eventos, wrestlers, equipes) */
+.lista-cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.lista-poster {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.lista-logo {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.lista-cartoes > .vazio {
+  grid-column: 1 / -1;
+}
+
+.cartao {
+  --cor-empresa: var(--borda-forte);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--cor-empresa);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cor-empresa) 14%, var(--superficie)) 0%, var(--superficie) 55%);
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgb(0 0 0 / 0.4), 0 0 24px color-mix(in srgb, var(--cor-empresa) 30%, transparent);
+}
+
+.cartao .moldura {
+  border-radius: 0;
+  background: rgb(0 0 0 / 0.25);
+}
+
+.moldura.sem-imagem {
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--cor-empresa) 35%, transparent), transparent 70%),
+    var(--fundo-elevado);
+}
+
+.moldura-marcador {
+  padding: 12px;
+  font-family: var(--fonte-titulo);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  color: color-mix(in srgb, var(--cor-empresa) 70%, white);
+  word-break: break-word;
+}
+
+.moldura-foto .moldura-marcador {
+  font-size: 56px;
+  opacity: 0.8;
+}
+
+.moldura-logo .moldura-marcador {
+  font-size: 40px;
+}
+
+.moldura-poster .moldura-marcador {
+  font-size: 26px;
+}
+
+.cartao-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px 14px;
+}
+
+.cartao-titulo {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cartao-subtitulo {
+  color: var(--texto-suave);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.cartao .selo {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* Linhas (tipos, estipulações, títulos, plataformas, métodos) */
+.lista-linhas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 860px;
+}
+
+.linha {
+  --cor-empresa: transparent;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 18px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--cor-empresa);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.linha:hover {
+  background: var(--superficie-2);
+  border-color: var(--borda-forte);
+  border-left-color: var(--cor-empresa);
+}
+
+.linha-titulo {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.linha-meta {
+  margin-left: auto;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.linha-seta {
+  color: var(--texto-fraco);
+  font-size: 22px;
+}
+
+.linha-meta + .linha-seta {
+  margin-left: 0;
+}
+
+.linha .selo + .linha-seta {
+  margin-left: auto;
+}
+
+.linha-titulo + .linha-seta {
+  margin-left: auto;
+}
+
+@media (max-width: 720px) {
+  .barra-ferramentas {
+    flex-wrap: wrap;
+  }
+  .barra-ferramentas .busca {
+    max-width: none;
+  }
+}
