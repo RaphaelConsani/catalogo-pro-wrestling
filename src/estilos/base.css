@@ -47,3 +47,8 @@ a {
 ::selection {
   background: rgb(var(--neon-rgb) / 0.3);
 }
+
+/* O atributo hidden sempre esconde, mesmo em elementos com display definido no CSS. */
+[hidden] {
+  display: none !important;
+}

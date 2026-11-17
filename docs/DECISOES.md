@@ -43,3 +43,17 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Membros de equipe: mesmo seletor da luta, com criação de wrestler na hora. Equipe exige pelo menos 2 membros.
 - Cor da empresa: paleta de 12 cores + seletor livre + campo hex.
 - Avisos (toasts) no canto inferior esquerdo, pra não cobrir o painel lateral.
+
+## Etapa 3 · Registro de luta
+
+- Nota: **estrelas + ajuste fino** (clica na estrela pra nota cheia, botões −¼/+¼), com `****¼` e o número (4,25) ao lado.
+- Nota 0 é exibida como **DUD**.
+- Duração: sempre `mm:ss`, minutos podem passar de 59 (ex.: `65:30`, até 3 dígitos). **Opcional.**
+- Tipos fixos: número de lados e de wrestlers por lado **exato** (pra luta desigual existe Handicap).
+- Tipos variáveis: dá pra adicionar e remover lados/wrestlers até o mínimo de 2 lados e 1 wrestler por lado.
+- Método de vitória: aparece e é obrigatório **só quando há vencedor**; some em Draw, Time Limit Draw e No Contest.
+- Visualização: data e nota obrigatórias, **plataforma opcional**, data vem com hoje.
+- Depois de salvar uma luta nova: formulário limpa mas **mantém evento, data e plataforma** (pra registrar o show em sequência).
+- Evento pode ser **criado na hora** no formulário (nome, data, empresa; pôster e parceiras depois em Cadastros).
+- Título em disputa: primeiro os da empresa principal e parceiras do evento, depois todos os outros.
+- Pra testar edição nesta etapa: lista de **últimas lutas registradas no Início**, cada uma abrindo a edição (base do Início definitivo).

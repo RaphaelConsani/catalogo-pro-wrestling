@@ -10,7 +10,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - **Commits** pequenos e descritivos ao fim de cada etapa aprovada.
 - **Nunca salve backups JSON nem dados pessoais dentro da pasta do projeto.** O repositório é público.
 - **Fase 2** (iPhone e "importar e mesclar") está fora do trabalho atual, mas nenhuma decisão de modelagem pode dificultá-la (ex.: IDs precisam ser únicos globalmente).
-- **Conferir eu mesmo antes de entregar.** O usuário prefere que o Claude verifique o app e o banco por conta própria (Chrome headless com perfil temporário no scratchpad, via DevTools Protocol), inclusive com prints, em vez de pedir pra ele checar o IndexedDB.
+- **Divisão dos testes.** O Claude faz todos os testes funcionais (validações, banco, fluxos, regras) por conta própria, no Chrome headless com perfil temporário no scratchpad (via DevTools Protocol), e confere prints. O usuário avalia **só o visual** em cada etapa; o teste funcional "pra valer" dele fica pra versão final. No fim de cada etapa, o "como testar" pra ele é um roteiro curto do que olhar no visual, não uma bateria de validações.
 - **Decisões já tomadas** ficam registradas em [docs/DECISOES.md](docs/DECISOES.md). Consulte antes de perguntar de novo; acrescente cada nova decisão lá.
 
 ## Etapas da fase 1
@@ -29,14 +29,13 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 
 - [x] Etapa 1 · Base do projeto (commit `9bae251`) + seletor de cor de destaque (commit `64ebc26`)
 - [x] Etapa 2 · Cadastros
-- [ ] Etapa 3 · Registro de luta
+- [x] Etapa 3 · Registro de luta
 - [ ] Etapas 4 a 9
 
 ### Pendências e lembretes pra próximas etapas
 
-- Etapa 3: campo de duração com máscara `mm:ss` já pré-formatada no input (guardar em segundos). Perguntar se minutos acima de 59 (ex.: `65:30`) são aceitos assim ou se prefere `h:mm:ss` nesses casos.
-- Etapa 3: ao excluir uma luta, marcar também as visualizações dela como excluídas (a contagem de uso de plataformas depende disso).
-- Etapa 3: reaproveitar `src/componentes/seletor-wrestlers.js` nos lados da luta.
+- Etapa 5: o formulário da luta já aceita pré-preenchimento — `montarFormulario(container, { inicial, aoSalvar })` em `src/telas/luta/formulario.js`; usar isso no "assisti" do backlog.
+- Etapa 4: a lista "Últimas lutas registradas" do Início (`src/telas/inicio.js`) é a base do Início definitivo; a edição está em `#/luta/<id>/editar`.
 - Etapa 4: dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ e acima de 4½.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 

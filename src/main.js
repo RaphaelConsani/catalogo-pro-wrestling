@@ -9,10 +9,13 @@ import './estilos/base.css';
 import './estilos/layout.css';
 import './estilos/componentes.css';
 import './estilos/cadastros.css';
+import './estilos/luta.css';
 
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';
 import { telaProvisoria } from './telas/provisoria.js';
+import { telaInicio } from './telas/inicio.js';
+import { telaNovaLuta, telaEditarLuta } from './telas/luta/formulario.js';
 import { telaCadastros, telaCadastro } from './telas/cadastros/cadastros.js';
 import { montarSeletorAcento } from './componentes/seletor-acento.js';
 
@@ -25,16 +28,9 @@ const menu = [
   { caminho: '/cadastros', nome: 'Cadastros' },
 ];
 
-definirRota('/', telaProvisoria({
-  rotulo: 'Início', titulo: 'Bem-vindo ao ringue', icone: '★',
-  descricao: 'Resumo das últimas lutas assistidas, destaques e atalhos.',
-  etapa: 'Conteúdo definido nas próximas etapas',
-}));
-definirRota('/nova-luta', telaProvisoria({
-  rotulo: 'Registro', titulo: 'Nova luta', icone: '✚',
-  descricao: 'Evento, tipo, estipulações, lados, resultado e visualizações.',
-  etapa: 'Etapa 3 · Registro de luta',
-}));
+definirRota('/', telaInicio);
+definirRota('/nova-luta', telaNovaLuta);
+definirRota('/luta/:id/editar', telaEditarLuta);
 definirRota('/biblioteca', telaProvisoria({
   rotulo: 'Acervo', titulo: 'Biblioteca', icone: '▦',
   descricao: 'Todas as lutas assistidas em cards, com filtros e busca.',
