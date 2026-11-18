@@ -63,6 +63,21 @@ nav.innerHTML = menu
   .map((m) => `<a href="#${m.caminho}" data-caminho="${m.caminho}"${m.acao ? ' class="acao"' : ''}>${m.nome}</a>`)
   .join('');
 
+// Menu ☰ do celular: abre e fecha a lista; fecha ao escolher uma tela, tocar fora ou apertar Esc.
+const topo = document.querySelector('.topo');
+const botaoMenu = document.getElementById('menu-botao');
+function abrirMenu(abrir) {
+  topo.classList.toggle('menu-aberto', abrir);
+  botaoMenu.setAttribute('aria-expanded', String(abrir));
+  botaoMenu.setAttribute('aria-label', abrir ? 'Fechar menu' : 'Abrir menu');
+}
+botaoMenu.addEventListener('click', () => abrirMenu(!topo.classList.contains('menu-aberto')));
+nav.addEventListener('click', (e) => e.target.closest('a') && abrirMenu(false));
+document.addEventListener('click', (e) => {
+  if (topo.classList.contains('menu-aberto') && !topo.contains(e.target)) abrirMenu(false);
+});
+document.addEventListener('keydown', (e) => e.key === 'Escape' && abrirMenu(false));
+
 function marcarAtivo(caminho) {
   for (const link of nav.querySelectorAll('a')) {
     const alvo = link.dataset.caminho;
