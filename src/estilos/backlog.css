@@ -136,15 +136,311 @@
     flex-basis: 100%;
   }
 
-  /* Filtros + ordem + alternador numa linha; os dois "adicionar" dividem a de baixo */
+  /* Filtros + ordem + alternador numa linha; Cagematch e os dois "adicionar" dividem a de baixo */
   .backlog-barra .ordem {
     flex: 1;
     min-width: 0;
   }
 
+  .backlog-barra .importar-cagematch,
   .backlog-barra .adicionar-evento,
   .backlog-barra .adicionar-luta {
     flex: 1;
     justify-content: center;
+  }
+}
+
+/* ---------- Importar do Cagematch (painel) ---------- */
+.cm-importar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.cm-busca {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cm-busca-linha {
+  display: flex;
+  gap: 10px;
+}
+
+.cm-busca-linha .campo-entrada {
+  flex: 1;
+  min-width: 0;
+}
+
+.cm-busca .campo-dica,
+.cm-busca .campo-erro {
+  margin: 0;
+}
+
+.cm-revisao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cm-revisao:empty {
+  display: none;
+}
+
+.cm-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+}
+
+.cm-bloco h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cm-bloco h3.cm-sub {
+  margin-top: 8px;
+}
+
+.cm-bloco p {
+  margin: 0;
+}
+
+.cm-evento h3 {
+  font-size: 24px;
+}
+
+.cm-evento p {
+  color: var(--texto-suave);
+}
+
+.cm-grade {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.4fr;
+  gap: 12px;
+}
+
+.cm-nova-empresa {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.cm-selo {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border: 1px solid var(--borda-forte);
+  border-radius: 999px;
+  color: var(--texto-suave);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cm-selo-ok {
+  border-color: rgb(57 217 138 / 0.5);
+  color: var(--sucesso);
+}
+
+.cm-selo-novo {
+  border-color: rgb(var(--neon-rgb) / 0.5);
+  color: var(--neon);
+}
+
+.cm-selo-aviso {
+  border-color: rgb(255 138 61 / 0.55);
+  color: #ffb27a;
+}
+
+.cm-selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cm-contador {
+  color: var(--texto-fraco);
+  font-family: var(--fonte-texto);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cm-lutas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cm-luta {
+  display: grid;
+  grid-template-columns: auto 1fr minmax(150px, 190px);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo-elevado);
+}
+
+.cm-luta.cm-desmarcada .cm-luta-corpo {
+  opacity: 0.5;
+}
+
+.cm-luta-marca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.cm-luta-marca input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--neon);
+}
+
+.cm-luta-num {
+  min-width: 18px;
+  color: var(--texto-fraco);
+  font-family: var(--fonte-titulo);
+  font-size: 18px;
+}
+
+.cm-luta-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cm-luta-confronto {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cm-luta-confronto span {
+  color: var(--texto-fraco);
+  font-weight: 400;
+}
+
+.cm-luta-detalhes {
+  color: var(--texto-suave);
+}
+
+.cm-luta-aviso {
+  color: #ffb27a;
+}
+
+.cm-luta-erro {
+  grid-template-columns: auto 1fr;
+  border-color: rgb(255 77 109 / 0.4);
+}
+
+.cm-luta-erro small {
+  display: block;
+  color: var(--texto-suave);
+}
+
+.cm-falta {
+  border-color: rgb(255 138 61 / 0.75);
+}
+
+.cm-escolha,
+.cm-novo {
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 280px);
+  align-items: center;
+  gap: 12px;
+}
+
+.cm-escolha-texto {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cm-escolha-texto small {
+  color: var(--texto-fraco);
+  font-weight: 400;
+}
+
+.cm-novo small {
+  color: var(--texto-fraco);
+}
+
+.cm-equipe {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.cm-equipe input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--neon);
+}
+
+.cm-rodape {
+  flex-wrap: wrap;
+}
+
+.cm-pendencias {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #ffb27a;
+  font-size: 13px;
+}
+
+.cm-pendencias:empty {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .cm-grade,
+  .cm-nova-empresa,
+  .cm-escolha,
+  .cm-novo {
+    grid-template-columns: 1fr;
+  }
+
+  .cm-luta {
+    grid-template-columns: auto 1fr;
+  }
+
+  .cm-luta .cm-tipo {
+    grid-column: 1 / -1;
+  }
+
+  .cm-bloco {
+    padding: 14px;
+  }
+
+  .cm-pendencias {
+    flex-basis: 100%;
+  }
+
+  /* No celular o rodapé mostra só a primeira pendência. */
+  .cm-pendencias li + li {
+    display: none;
   }
 }

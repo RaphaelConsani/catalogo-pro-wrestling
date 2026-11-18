@@ -3,6 +3,7 @@ import { db } from '../db/schema.js';
 import { nomeLado } from '../db/lutas.js';
 import { backlogPendente, carregarItem, salvarItemLuta, salvarItemEvento, eventoNoBacklog, concluirItem, removerItem } from '../db/backlog.js';
 import { montarFormulario } from './luta/formulario.js';
+import { abrirImportarCagematch } from '../componentes/importar-cagematch.js';
 import { criarSeletorEvento } from '../componentes/seletor-evento.js';
 import { abrirPainel, fecharPainel } from '../componentes/painel.js';
 import { confirmar, avisar } from '../componentes/dialogo.js';
@@ -206,6 +207,7 @@ export async function telaBacklog(container) {
       <button type="button" class="botao botao-fantasma alternar-filtros" aria-expanded="false">Filtros</button>
       <select class="campo-entrada ordem" aria-label="Ordenar"></select>
       ${htmlAlternarVisao(lerVisao('backlog'))}
+      <button type="button" class="botao botao-fantasma importar-cagematch">Do Cagematch</button>
       <button type="button" class="botao botao-fantasma adicionar-evento">＋ Evento inteiro</button>
       <button type="button" class="botao botao-primario adicionar-luta">＋ Luta</button>
     </div>
@@ -421,6 +423,7 @@ export async function telaBacklog(container) {
   });
   $('.adicionar-luta').addEventListener('click', () => abrirFormLuta());
   $('.adicionar-evento').addEventListener('click', abrirFormEvento);
+  $('.importar-cagematch').addEventListener('click', () => abrirImportarCagematch({ aoConcluir: recarregar }));
   ligarAlternarVisao(container.querySelector('.alternar-visao'), 'backlog', (v) => {
     visao = v;
     montarOrdens();
@@ -452,13 +455,27 @@ const itemIndisponivel = (container) => {
     <span>Ele pode já ter saído do backlog. <a href="#/backlog">Voltar ao backlog</a></span></div></div>`;
 };
 
+// Item importado do Cagematch: resultado, título e duração ficam guardados (escondidos no Backlog)
+// e só preenchem o formulário aqui. O vencedor é achado pelos wrestlers (os lados podem ter sido editados).
+function doCagematch(item) {
+  const cm = item.cagematch;
+  if (!cm) return {};
+  const dados = { tituloId: cm.tituloId ?? null, duracaoSeg: cm.duracaoSeg ?? null };
+  if (cm.resultado && cm.resultado !== 'vitoria') dados.resultado = cm.resultado;
+  if (cm.resultado === 'vitoria' && cm.vencedorIds?.length) {
+    const lado = item.lados.findIndex((l) => cm.vencedorIds.some((id) => l.wrestlersIds.includes(id)));
+    if (lado >= 0) Object.assign(dados, { resultado: 'vitoria', ladoVencedor: lado, metodoVitoriaId: cm.metodoVitoriaId ?? null });
+  }
+  return dados;
+}
+
 // Luta do backlog: abre o formulário completo já preenchido; ao salvar, o item sai do backlog.
 export async function telaAssistiBacklog(container, { id }) {
   const item = await carregarItem(id);
   if (!item || item.concluidoEm || item.tipo !== 'luta') return itemIndisponivel(container);
   await montarFormulario(container, {
     rotulo: 'Do backlog',
-    inicial: { eventoId: item.eventoId, tipoMatchId: item.tipoMatchId, estipulacoesIds: item.estipulacoesIds, lados: item.lados },
+    inicial: { eventoId: item.eventoId, tipoMatchId: item.tipoMatchId, estipulacoesIds: item.estipulacoesIds, lados: item.lados, ...doCagematch(item) },
     aoSalvar: async (luta) => {
       // A luta já está salva: se tirar do backlog falhar, avisa e sai do formulário
       // (ficar nele deixaria salvar de novo e duplicar a luta).
