@@ -1,5 +1,8 @@
 // Service worker do app (modelo: o build preenche a versão e a lista de arquivos; ver vite.config.js).
 // - Na instalação, guarda todos os arquivos do app no cache: abre offline.
+// - Versão nova espera todas as janelas do app fecharem pra assumir (sem skipWaiting):
+//   uma janela aberta ainda pode carregar gráficos/Excel da versão antiga, cujo cache
+//   só é apagado quando a nova assume.
 // - Página (index.html): tenta a rede primeiro (pega a versão nova), cai no cache sem internet.
 // - Demais arquivos têm hash no nome e nunca mudam: cache primeiro.
 // Os dados do usuário ficam no IndexedDB e não passam por aqui.
@@ -9,7 +12,7 @@ const CACHE = `catalogo-pw-${VERSAO}`;
 const ARQUIVOS = __ARQUIVOS__;
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS)));
 });
 
 self.addEventListener('activate', (e) => {
@@ -27,8 +30,11 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(req)
         .then((resp) => {
-          const copia = resp.clone();
-          caches.open(CACHE).then((c) => c.put('./', copia));
+          // Só guarda página que veio certa: um 404/500 não pode virar a cópia offline.
+          if (resp.ok) {
+            const copia = resp.clone();
+            caches.open(CACHE).then((c) => c.put('./', copia));
+          }
           return resp;
         })
         .catch(() => caches.match('./')),

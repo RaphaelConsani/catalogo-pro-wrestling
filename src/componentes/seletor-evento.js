@@ -101,7 +101,9 @@ export async function criarSeletorEvento({ valor = null, aoMudar } = {}) {
 
     d.addEventListener('close', () => d.remove());
     d.querySelector('[value="nao"]').addEventListener('click', () => d.close());
+    let salvando = false; // evita criar o evento duas vezes (clique duplo / Enter repetido)
     const confirmar = async () => {
+      if (salvando) return;
       let ok = true;
       for (const c of Object.values(campos)) {
         const erro = c.erro();
@@ -110,15 +112,23 @@ export async function criarSeletorEvento({ valor = null, aoMudar } = {}) {
       }
       if (!ok) return;
       const dados = { nome: campos.nome.ler(), data: campos.data.ler(), empresaId: campos.empresaId.ler(), parceirasIds: [], imagemId: null };
-      if (await buscarDuplicado('eventos', dados)) {
-        mostrarErro(campos.nome, 'Já existe um evento com esse nome nessa data.');
-        return;
+      salvando = true;
+      try {
+        if (await buscarDuplicado('eventos', dados)) {
+          mostrarErro(campos.nome, 'Já existe um evento com esse nome nessa data.');
+          return;
+        }
+        const novo = await salvar('eventos', dados);
+        await carregar();
+        d.close();
+        toast(`Evento “${novo.nome}” criado`);
+        escolher(novo.id);
+      } catch (erro) {
+        console.error(erro);
+        toast('Não foi possível criar o evento.', 'erro');
+      } finally {
+        salvando = false;
       }
-      const novo = await salvar('eventos', dados);
-      await carregar();
-      d.close();
-      toast(`Evento “${novo.nome}” criado`);
-      escolher(novo.id);
     };
     d.querySelector('[value="sim"]').addEventListener('click', confirmar);
     form.addEventListener('keydown', (e) => {

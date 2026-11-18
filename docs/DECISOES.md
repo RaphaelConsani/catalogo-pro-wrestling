@@ -136,3 +136,18 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 
 - Backlog ganha filtro de **empresa** igual ao da Biblioteca: botão "Filtros" com painel (por ora só Empresa) e chip do filtro ativo. Considera **principal + parceiras** do evento.
 - Ordem por **empresa** (A–Z e Z–A) no seletor, nas duas visões; na lista, **coluna Empresa separada** com cabeçalho ordenável (escondida no celular).
+
+## Revisão externa (agentes de código e de QA, 18/11/2026)
+
+- Backlog em cards: com busca, cada grupo mostra **só os itens que batem** com a busca (igual à lista e ao contador). Decidido pelo Claude na rodada anterior e aprovado depois pelo usuário; registrado aqui.
+- Duração com 1 ou 2 dígitos vale como segundos ("45" → 00:45).
+- Paleta de cores das empresas **sem o dourado** (o `#f5c542` sai; entra um verde-limão).
+- Cor de destaque **vai no backup** (como já estava combinado na etapa 1); restaurar aplica a cor.
+- Backlog: luta repetida (mesmo evento, tipo e lados) mostra **aviso com "Adicionar mesmo assim"**.
+- Visualização: data **no futuro é bloqueada**; data **anterior ao evento só avisa** (pede confirmação ao salvar).
+- Busca da Biblioteca também encontra o **método de vitória**.
+- Página não encontrada sem o texto de "Em construção".
+- Equipe com mais membros que o tipo permite: preenche **até o limite** e avisa quem ficou de fora.
+- Destaques 4.50+: desempate entre notas iguais pela **visualização mais recente**.
+- Excel: nota 0 sai como **DUD** (texto).
+- App atualizado: a versão nova só assume quando todas as janelas do app fecharem (evita falha nos gráficos/Excel com o app aberto).

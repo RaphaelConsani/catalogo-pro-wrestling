@@ -5,18 +5,10 @@ import { lerVisao, htmlAlternarVisao, ligarAlternarVisao } from '../componentes/
 import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { esc, normalizar, formatarData, plural } from '../util/texto.js';
 import { formatarNota } from '../util/nota.js';
+import { cmp, porTexto } from '../util/ordenar.js';
 
 const LOTE = 60;
 
-const cmp = (a, b) => (a ?? '').localeCompare(b ?? '');
-const alfa = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
-// Texto vazio vai sempre pro fim, nas duas direções.
-const porTexto = (f, dir = 1) => (a, b) => {
-  const x = f(a) ?? '';
-  const y = f(b) ?? '';
-  if (!x || !y) return (x ? 0 : 1) - (y ? 0 : 1);
-  return dir * alfa.compare(x, y);
-};
 const empresaDe = (i) => i.empresa?.sigla || i.empresa?.nome;
 
 // As de texto (A–Z) também são usadas pelo cabeçalho da tabela na visão em lista.
@@ -168,6 +160,7 @@ export async function telaBiblioteca(container) {
     }
     if (visao === 'lista') elGrade.innerHTML = htmlTabelaLutas([], estado.ordem);
     mostrarMais();
+    reobservar();
   }
 
   function mostrarMais() {
@@ -184,6 +177,12 @@ export async function telaBiblioteca(container) {
     if (entradas.some((e) => e.isIntersecting)) mostrarMais();
   }, { rootMargin: '600px' });
   observador.observe($('.sentinela'));
+  // Depois de redesenhar, a sentinela pode já estar visível (e o observador só avisa
+  // quando ela entra na tela): observar de novo força uma nova checagem.
+  const reobservar = () => {
+    observador.unobserve($('.sentinela'));
+    observador.observe($('.sentinela'));
+  };
 
   let espera;
   elBusca.addEventListener('input', () => {

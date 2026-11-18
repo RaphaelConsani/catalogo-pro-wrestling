@@ -3,9 +3,9 @@ import { salvarLuta, excluirLuta, carregarLuta, nomeLado } from '../../db/lutas.
 import { criarSeletorEvento } from '../../componentes/seletor-evento.js';
 import { criarSeletorWrestlers } from '../../componentes/seletor-wrestlers.js';
 import { criarCampoNota } from '../../componentes/nota.js';
-import { confirmar } from '../../componentes/dialogo.js';
+import { confirmar, avisar } from '../../componentes/dialogo.js';
 import { toast } from '../../componentes/toast.js';
-import { esc, plural } from '../../util/texto.js';
+import { esc, plural, formatarData } from '../../util/texto.js';
 import { hoje } from '../../util/datas.js';
 import { mascararDuracao, duracaoParaSegundos, segundosParaDuracao } from '../../util/duracao.js';
 
@@ -228,15 +228,23 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     el.classList.toggle('alerta', limite ? n !== limite : n < 1);
   }
 
+  // Cada desenho tem um número; se outro começar enquanto este espera o banco
+  // (ex.: trocar de tipo rápido), este desiste e não duplica os cards.
+  let versaoLados = 0;
   async function renderLados() {
+    const versao = ++versaoLados;
     const t = estado.tipo;
     $('.lados-dica').hidden = Boolean(t);
     $('.adicionar-lado').hidden = !t?.variavel;
     const elLados = $('.lados');
-    seletoresLados.length = 0;
-    elLados.replaceChildren();
-    if (!t) return renderResultados();
+    if (!t) {
+      seletoresLados.length = 0;
+      elLados.replaceChildren();
+      return renderResultados();
+    }
 
+    const cards = [];
+    const seletores = [];
     const podeRemover = t.variavel && estado.lados.length > 2;
     for (const [i, lado] of estado.lados.entries()) {
       const card = document.createElement('div');
@@ -259,11 +267,15 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
         compacto: true,
         aoMudar: (ids) => aoMudarWrestlers(i, ids),
       });
-      seletoresLados[i] = seletor;
+      if (versao !== versaoLados) return;
+      seletores[i] = seletor;
       card.append(seletor.el);
-      elLados.append(card);
-      contadorLado(i);
+      cards.push(card);
     }
+    seletoresLados.length = 0;
+    seletoresLados.push(...seletores);
+    elLados.replaceChildren(...cards);
+    estado.lados.forEach((_, i) => contadorLado(i));
     renderResultados();
   }
 
@@ -287,8 +299,17 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     const equipe = ctx.equipes.get(select.value);
     estado.lados[i].equipeId = equipe?.id ?? null;
     if (equipe) {
-      // A equipe preenche os membros; dá pra editar depois.
-      estado.lados[i].wrestlersIds = [...equipe.membrosIds];
+      // A equipe preenche os membros (até o limite do tipo); dá pra editar depois.
+      const limite = limiteLado();
+      const membros = [...equipe.membrosIds];
+      if (limite && membros.length > limite) {
+        const fora = membros.splice(limite).map((id) => ctx.wrestlers.get(id)?.nome ?? '?');
+        avisar({
+          titulo: 'Equipe maior que o lado',
+          mensagem: `${equipe.nome} tem ${equipe.membrosIds.length} membros, e ${estado.tipo.nome} aceita ${limite} por lado. Ficaram de fora: ${fora.join(', ')}. Troque no seletor se precisar.`,
+        });
+      }
+      estado.lados[i].wrestlersIds = membros;
       seletoresLados[i].definir(estado.lados[i].wrestlersIds);
       contadorLado(i);
       limparErro('lados');
@@ -446,7 +467,9 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     if (!estado.visualizacoes.length) erros.visualizacoes = 'Registre pelo menos uma visualização.';
     else {
       const i = estado.visualizacoes.findIndex((v) => !v.data || v.nota.valor() == null);
+      const futura = estado.visualizacoes.findIndex((v) => v.data > hoje());
       if (i >= 0) erros.visualizacoes = `Preencha a data e a nota da ${i + 1}ª visualização.`;
+      else if (futura >= 0) erros.visualizacoes = `A data da ${futura + 1}ª visualização está no futuro.`;
     }
   }
 
@@ -486,18 +509,34 @@ export async function montarFormulario(container, { luta = null, visualizacoes =
     botao.disabled = true;
     if (backlog) {
       try {
-        await aoSalvar({
+        const salvou = await aoSalvar({
           eventoId: estado.evento.id,
           tipoMatchId: estado.tipo.id,
           estipulacoesIds: estipulacoes.filter((x) => estado.estipulacoesIds.has(x.id)).map((x) => x.id),
           lados: estado.lados.map((l) => ({ equipeId: l.equipeId, wrestlersIds: [...l.wrestlersIds] })),
         });
+        if (salvou === false) botao.disabled = false; // quem chamou desistiu (ex.: luta repetida)
       } catch (erro) {
         console.error(erro);
         toast('Não foi possível salvar no backlog.', 'erro');
         botao.disabled = false;
       }
       return;
+    }
+    // Assistiu antes da data do evento? Pode ser erro de digitação: pergunta.
+    const dataEvento = estado.evento.data;
+    const antes = dataEvento ? estado.visualizacoes.findIndex((v) => v.data < dataEvento) : -1;
+    if (antes >= 0) {
+      const v = estado.visualizacoes[antes];
+      const seguir = await confirmar({
+        titulo: 'Data anterior ao evento',
+        mensagem: `A ${antes + 1}ª visualização (${formatarData(v.data)}) é anterior à data do evento (${formatarData(dataEvento)}). Salvar mesmo assim?`,
+        confirmarTexto: 'Salvar mesmo assim',
+      });
+      if (!seguir) {
+        botao.disabled = false;
+        return;
+      }
     }
     const dados = {
       ...(editando ? { id: luta.id } : {}),

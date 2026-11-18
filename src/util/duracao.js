@@ -8,9 +8,10 @@ export function mascararDuracao(texto) {
   return `${d.slice(0, -2)}:${d.slice(-2)}`;
 }
 
-// "23:45" -> 1425 · "" -> null · inválido -> NaN
+// "23:45" -> 1425 · "45" -> 45 (só segundos) · "" -> null · inválido -> NaN
 export function duracaoParaSegundos(texto) {
   if (!texto) return null;
+  if (/^\d{1,2}$/.test(texto)) texto = `0:${texto.padStart(2, '0')}`;
   const m = /^(\d{1,3}):(\d{2})$/.exec(texto);
   if (!m) return NaN;
   const seg = Number(m[2]);

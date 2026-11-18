@@ -381,8 +381,8 @@ export async function telaDashboards(container) {
     const dados = destaques(lista);
     let todos = false;
     let ordem = null; // null = ordem padrão (maior nota, depois assistida por último)
+    let visao = lerVisao('destaques'); // guardada aqui também: funciona mesmo sem localStorage
     const desenhar = () => {
-      const visao = lerVisao('destaques');
       const ordenados = ordem ? ordenar(dados, ordem) : dados;
       const mostrar = todos ? ordenados : ordenados.slice(0, DESTAQUES_INICIAL);
       el.innerHTML = `
@@ -404,6 +404,7 @@ export async function telaDashboards(container) {
     el.addEventListener('click', (e) => {
       const v = e.target.closest('[data-visao]')?.dataset.visao;
       if (v) {
+        visao = v;
         gravarVisao('destaques', v);
         return desenhar();
       }

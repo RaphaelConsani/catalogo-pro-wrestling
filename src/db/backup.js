@@ -4,7 +4,8 @@ import { agora } from '../util/ids.js';
 // Backup completo em JSON, com as imagens embutidas (base64).
 // Vai TUDO, inclusive registros com exclusão lógica (excluidoEm) e itens concluídos
 // do backlog: a fase 2 ("importar e mesclar") vai precisar deles pra saber o que foi apagado.
-// A tabela config fica de fora (é do aparelho: data do último backup, lembrete).
+// Da tabela config só vai a cor de destaque (corAcento); o resto é do aparelho
+// (data do último backup, lembrete).
 
 export const APP = 'catalogo-pro-wrestling';
 export const FORMATO = 1;
@@ -32,11 +33,14 @@ function base64ParaBlob(base64, tipo) {
   return new Blob([bytes], { type: tipo });
 }
 
+const CONFIG_NO_BACKUP = ['corAcento'];
+
 export async function montarBackup() {
   const tabelas = {};
-  await db.transaction('r', [...TABELAS, 'imagens'], async () => {
+  await db.transaction('r', [...TABELAS, 'imagens', 'config'], async () => {
     for (const t of TABELAS) tabelas[t] = await db.table(t).toArray();
     tabelas.imagens = await db.imagens.toArray();
+    tabelas.config = (await db.config.bulkGet(CONFIG_NO_BACKUP)).filter(Boolean);
   });
   const imagens = [];
   for (const { blob, ...resto } of tabelas.imagens) {
@@ -93,6 +97,9 @@ export async function lerBackup(arquivo) {
     if (t === 'imagens' && lista.some((r) => typeof r.dados !== 'string')) throw new BackupInvalido('O backup está corrompido (imagens).');
     dados.tabelas[t] = lista;
   }
+  // config é opcional (backups antigos não têm); só as chaves conhecidas são usadas.
+  const config = Array.isArray(dados.tabelas.config) ? dados.tabelas.config : [];
+  dados.tabelas.config = config.filter((r) => r && CONFIG_NO_BACKUP.includes(r.chave));
   const ativos = (t) => dados.tabelas[t].filter((r) => !r.excluidoEm).length;
   return {
     backup: dados,
@@ -119,7 +126,17 @@ export async function importarBackup(backup) {
     // O que está no app agora é exatamente o conteúdo de um arquivo de backup.
     await db.config.put({ chave: 'ultimoBackup', valor: backup.exportadoEm ?? agora() });
     await db.config.delete('lembreteDispensadoEm');
+    if (backup.tabelas.config?.length) await db.config.bulkPut(backup.tabelas.config);
   });
+  // Cópia local da cor (a página recarrega depois e aplica antes do banco abrir).
+  const cor = backup.tabelas.config?.find((r) => r.chave === 'corAcento')?.valor;
+  if (cor) {
+    try {
+      localStorage.setItem('corAcento', cor);
+    } catch {
+      /* sem localStorage: a cor vem do banco ao carregar */
+    }
+  }
 }
 
 // ---------- Lembrete de 7 dias ----------
@@ -128,16 +145,28 @@ export const DIAS_LEMBRETE = 7;
 const DIA_MS = 86400000;
 
 // Devolve null (sem lembrete) ou { dias, nunca } pra montar a faixa.
+// Data da 1ª luta registrada. Ler a tabela toda a cada troca de tela pesa com muitas
+// lutas: guarda o resultado e só refaz quando a quantidade de lutas no banco muda.
+const cachePrimeira = { total: -1, valor: null };
+async function primeiraLuta() {
+  const total = await db.lutas.count();
+  if (total !== cachePrimeira.total) {
+    let primeira = null;
+    await db.lutas.each((l) => {
+      if (!l.excluidoEm && (!primeira || l.criadoEm < primeira)) primeira = l.criadoEm;
+    });
+    Object.assign(cachePrimeira, { total, valor: primeira });
+  }
+  return cachePrimeira.valor;
+}
+
 export async function situacaoLembrete() {
   const [ultimo, dispensado] = await Promise.all([lerConfig('ultimoBackup'), lerConfig('lembreteDispensadoEm')]);
   if (dispensado === hojeISO()) return null;
   let base = ultimo;
   if (!base) {
     // Nunca exportou: conta a partir da 1ª luta registrada (app vazio não lembra).
-    let primeira = null;
-    await db.lutas.each((l) => {
-      if (!l.excluidoEm && (!primeira || l.criadoEm < primeira)) primeira = l.criadoEm;
-    });
+    const primeira = await primeiraLuta();
     if (!primeira) return null;
     base = primeira;
   }

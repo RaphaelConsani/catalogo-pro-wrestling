@@ -18,7 +18,7 @@ import './estilos/lista.css';
 
 import { db } from './db/schema.js';
 import { definirRota, iniciarRouter } from './router.js';
-import { telaProvisoria } from './telas/provisoria.js';
+import { telaNaoEncontrada } from './telas/nao-encontrada.js';
 import { telaInicio } from './telas/inicio.js';
 import { telaNovaLuta, telaEditarLuta } from './telas/luta/formulario.js';
 import { telaBiblioteca } from './telas/biblioteca.js';
@@ -53,11 +53,7 @@ definirRota('/backlog/:id/registrar', telaRegistrarEventoBacklog);
 definirRota('/cadastros', telaCadastros);
 definirRota('/cadastros/:entidade', telaCadastro);
 definirRota('/dados', telaDados);
-definirRota('*', telaProvisoria({
-  rotulo: 'Erro', titulo: 'Página não encontrada', icone: '?',
-  descricao: 'Esse endereço não existe.',
-  etapa: 'Use o menu acima pra voltar',
-}));
+definirRota('*', telaNaoEncontrada);
 
 const nav = document.getElementById('menu');
 nav.innerHTML = menu

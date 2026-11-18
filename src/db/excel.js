@@ -16,7 +16,8 @@ function serialExcel(iso) {
 }
 
 const data = (iso) => (iso ? { t: 'n', v: serialExcel(iso), z: FORMATO_DATA } : null);
-const nota = (n) => (n == null ? null : { t: 'n', v: n, z: FORMATO_NOTA });
+// Nota 0 sai como DUD (texto); as demais como número com duas casas.
+const nota = (n) => (n == null ? null : n === 0 ? 'DUD' : { t: 'n', v: n, z: FORMATO_NOTA });
 
 export function linhasLutas(itens, ctx) {
   const cab = ['Evento', 'Data do evento', 'Empresa', 'Parceiras', 'Tipo', 'Estipulações', 'Confronto', 'Resultado', 'Vencedor',

@@ -131,8 +131,9 @@ export function campoMultiChips({ rotulo, valor = [], opcoes, dica = '' }) {
 }
 
 // Cores prontas que funcionam bem no tema escuro + seletor livre + hex.
+// Sem dourado: ele é reservado pras lutas 5★ e acima de 4½.
 export const PALETA_EMPRESAS = [
-  '#ff3b5c', '#e11d48', '#ff8a3d', '#f5c542', '#39d98a', '#14b8a6',
+  '#ff3b5c', '#e11d48', '#ff8a3d', '#84cc16', '#39d98a', '#14b8a6',
   '#22e6ff', '#3b82f6', '#6366f1', '#a855ff', '#ec4899', '#cbd5e1',
 ];
 

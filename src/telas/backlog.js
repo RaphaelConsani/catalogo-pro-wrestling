@@ -1,13 +1,15 @@
 import { ativos } from '../db/repo.js';
+import { db } from '../db/schema.js';
 import { nomeLado } from '../db/lutas.js';
 import { backlogPendente, carregarItem, salvarItemLuta, salvarItemEvento, eventoNoBacklog, concluirItem, removerItem } from '../db/backlog.js';
 import { montarFormulario } from './luta/formulario.js';
 import { criarSeletorEvento } from '../componentes/seletor-evento.js';
 import { abrirPainel, fecharPainel } from '../componentes/painel.js';
-import { confirmar } from '../componentes/dialogo.js';
+import { confirmar, avisar } from '../componentes/dialogo.js';
 import { toast } from '../componentes/toast.js';
 import { esc, normalizar, formatarData, plural } from '../util/texto.js';
 import { lerVisao, htmlAlternarVisao, ligarAlternarVisao, htmlCabecalho } from '../componentes/visao.js';
+import { cmp, porTexto } from '../util/ordenar.js';
 
 const ORDENS = {
   adicionado: 'Adicionados por último',
@@ -25,31 +27,32 @@ const ORDENS = {
 // Na visão em cards (agrupada por evento) não dá pra ordenar por confronto ou tipo.
 const ORDENS_GRUPOS = ['adicionado', 'evento_desc', 'evento_asc', 'eventonome_asc', 'eventonome_desc', 'empresa_asc', 'empresa_desc'];
 const siglaGrupo = (g) => g.empresa?.sigla || g.empresa?.nome;
-const alfa = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
-// Texto vazio vai sempre pro fim, nas duas direções.
-const porTexto = (f, dir = 1) => (a, b) => {
-  const x = f(a) ?? '';
-  const y = f(b) ?? '';
-  if (!x || !y) return (x ? 0 : 1) - (y ? 0 : 1);
-  return dir * alfa.compare(x, y);
-};
+
 // Busca e ordem ficam guardadas durante a sessão.
 // Filtro de empresa: principal + parceiras do evento (igual à Biblioteca).
 const estado = { busca: '', ordem: 'adicionado', filtros: { empresa: '' }, painelAberto: false };
-const cmp = (a, b) => (a ?? '').localeCompare(b ?? '');
 
 async function carregarDados() {
-  const [itens, lutas, ...listas] = await Promise.all([
+  const [itens, ...listas] = await Promise.all([
     backlogPendente(),
-    ativos('lutas'),
     ...['eventos', 'empresas', 'wrestlers', 'equipes', 'tiposMatch', 'estipulacoes'].map(ativos),
   ]);
   const [eventos, empresas, wrestlers, equipes, tipos, estipulacoes] = listas.map((l) => new Map(l.map((x) => [x.id, x])));
   const ctx = { eventos, empresas, wrestlers, equipes, tipos, estipulacoes };
+  // Lutas já registradas: só interessa a contagem dos eventos inteiros pendentes (usa o índice).
+  const idsEventos = [...new Set(itens.filter((i) => i.tipo === 'evento').map((i) => i.eventoId))];
   const lutasPorEvento = new Map();
-  for (const l of lutas) lutasPorEvento.set(l.eventoId, (lutasPorEvento.get(l.eventoId) ?? 0) + 1);
+  if (idsEventos.length) {
+    await db.lutas.where('eventoId').anyOf(idsEventos).each((l) => {
+      if (!l.excluidoEm) lutasPorEvento.set(l.eventoId, (lutasPorEvento.get(l.eventoId) ?? 0) + 1);
+    });
+  }
   return { itens, ctx, lutasPorEvento };
 }
+
+// Mesma luta = mesmo evento, mesmo tipo e os mesmos lados (em qualquer ordem).
+const assinaturaLados = (lados) => lados.map((l) => [...l.wrestlersIds].sort().join(',')).sort().join('|');
+const mesmaLuta = (a, b) => a.eventoId === b.eventoId && a.tipoMatchId === b.tipoMatchId && assinaturaLados(a.lados) === assinaturaLados(b.lados);
 
 // Agrupa por evento: o evento inteiro e as lutas avulsas do mesmo evento ficam juntos.
 function agrupar(itens, ctx) {
@@ -81,7 +84,6 @@ function agrupar(itens, ctx) {
       item.grupo = g;
       item.busca = normalizar(partes.filter(Boolean).join(' '));
     }
-    g.busca = [g.inteiro, ...g.lutas].filter(Boolean).map((i) => i.busca).join(' ');
   }
   return [...grupos.values()];
 }
@@ -258,11 +260,15 @@ export async function telaBacklog(container) {
     const emp = estado.filtros.empresa;
     const daEmpresa = (g) => !emp || [g.evento?.empresaId, ...(g.evento?.parceirasIds ?? [])].includes(emp);
     const passaBusca = (i) => !termo || termo.split(' ').every((p) => i.busca.includes(p));
-    const visiveis = ordenarGrupos(grupos.filter((g) => daEmpresa(g) && (!termo || termo.split(' ').every((p) => g.busca.includes(p)))));
+    // Filtra item por item (a busca pode bater em lutas diferentes do mesmo evento
+    // sem bater em nenhuma sozinha); grupos sem nenhum item visível somem.
+    const visiveis = ordenarGrupos(grupos.filter(daEmpresa)
+      .map((g) => ({ ...g, inteiro: g.inteiro && passaBusca(g.inteiro) ? g.inteiro : null, lutas: g.lutas.filter(passaBusca) }))
+      .filter((g) => g.inteiro || g.lutas.length));
     renderFiltrosAtivos();
     const nLutas = itens.filter((i) => i.tipo === 'luta').length;
     const nEventos = itens.length - nLutas;
-    const nVisiveis = visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean)).filter(passaBusca).length;
+    const nVisiveis = visiveis.reduce((n, g) => n + g.lutas.length + (g.inteiro ? 1 : 0), 0);
     $('.backlog-contador').textContent = !itens.length
       ? ''
       : nVisiveis !== itens.length
@@ -278,17 +284,12 @@ export async function telaBacklog(container) {
       return;
     }
     if (visao === 'lista') {
-      const linhas = ordenarItens(visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean)).filter(passaBusca));
+      const linhas = ordenarItens(visiveis.flatMap((g) => [g.inteiro, ...g.lutas].filter(Boolean)));
       el.innerHTML = `<table class="tabela-lutas tabela-backlog">${htmlCabecalho(COLUNAS_BACKLOG, estado.ordem)}
         <tbody>${linhas.map((i) => htmlLinhaBacklog(i, lutasPorEvento)).join('')}</tbody></table>`;
       return;
     }
-    // Em cada grupo, só os itens que batem com a busca (igual à lista).
-    el.innerHTML = visiveis
-      .map((g) => ({ ...g, inteiro: g.inteiro && passaBusca(g.inteiro) ? g.inteiro : null, lutas: g.lutas.filter(passaBusca) }))
-      .filter((g) => g.inteiro || g.lutas.length)
-      .map((g) => htmlGrupo(g, ctx, lutasPorEvento))
-      .join('');
+    el.innerHTML = visiveis.map((g) => htmlGrupo(g, ctx, lutasPorEvento)).join('');
   }
 
   // ---------- Painéis ----------
@@ -298,6 +299,15 @@ export async function telaBacklog(container) {
       modo: 'backlog',
       inicial: item,
       aoSalvar: async (d) => {
+        const repetida = dados.itens.find((i) => i.tipo === 'luta' && i.id !== item?.id && mesmaLuta(i, d));
+        if (repetida) {
+          const seguir = await confirmar({
+            titulo: 'Luta repetida',
+            mensagem: 'Essa luta (mesmo evento, tipo e lados) já está no backlog. Adicionar mesmo assim?',
+            confirmarTexto: 'Adicionar mesmo assim',
+          });
+          if (!seguir) return false; // não salvou: o formulário continua aberto
+        }
         await salvarItemLuta({ ...(item ? { id: item.id } : {}), ...d });
         fecharPainel();
         toast(item ? 'Item atualizado' : 'Luta adicionada ao backlog');
@@ -331,12 +341,20 @@ export async function telaBacklog(container) {
     botao.addEventListener('click', async () => {
       const ev = seletor.valor();
       if (!ev) return mostrarErro('Escolha o evento.');
-      if (await eventoNoBacklog(ev.id)) return mostrarErro('Esse evento já está no backlog.');
-      botao.disabled = true;
-      await salvarItemEvento(ev.id);
-      fecharPainel();
-      toast('Evento adicionado ao backlog');
-      await recarregar();
+      if (botao.disabled) return;
+      botao.disabled = true; // trava antes da checagem: clique duplo não duplica o evento
+      try {
+        if (await eventoNoBacklog(ev.id)) return mostrarErro('Esse evento já está no backlog.');
+        await salvarItemEvento(ev.id);
+        fecharPainel();
+        toast('Evento adicionado ao backlog');
+        await recarregar();
+      } catch (erro) {
+        console.error(erro);
+        toast('Não foi possível adicionar ao backlog.', 'erro');
+      } finally {
+        botao.disabled = false;
+      }
     });
     abrirPainel({ titulo: 'Evento inteiro', subtitulo: 'Backlog', conteudo, rodape });
   }
@@ -442,8 +460,18 @@ export async function telaAssistiBacklog(container, { id }) {
     rotulo: 'Do backlog',
     inicial: { eventoId: item.eventoId, tipoMatchId: item.tipoMatchId, estipulacoesIds: item.estipulacoesIds, lados: item.lados },
     aoSalvar: async (luta) => {
-      await concluirItem(item.id, luta.id);
-      toast('Luta registrada e removida do backlog');
+      // A luta já está salva: se tirar do backlog falhar, avisa e sai do formulário
+      // (ficar nele deixaria salvar de novo e duplicar a luta).
+      try {
+        await concluirItem(item.id, luta.id);
+        toast('Luta registrada e removida do backlog');
+      } catch (erro) {
+        console.error(erro);
+        await avisar({
+          titulo: 'Luta registrada',
+          mensagem: 'A luta foi salva no catálogo, mas não saiu do backlog. Remova o item do backlog manualmente.',
+        });
+      }
       location.hash = '#/backlog';
     },
   });

@@ -48,6 +48,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - **Etapa 9 · Importação.** Olhar: Biblioteca, Backlog e Dashboards com os dados reais; nomes de eventos, wrestlers e cores das empresas. As 4 lutas do WrestleDream 2025 sem nota estão no Backlog (usar "Assisti" se foram vistas); métodos de vitória das lutas importadas estão em branco.
 - **Revisão · Cards ou lista** (pedido do usuário, feito em 17/11/2026). Olhar: o alternador (ícones de quadradinhos e linhas) na Biblioteca, no Backlog, na página do wrestler e nos destaques dos Dashboards; a tabela no computador e no celular. Escolhas do Claude: ícones do alternador; linha de 5★ com leve fundo dourado e nota dourada a partir de 4.50; faixa na cor da empresa no começo da linha; cabeçalho da tabela fica fixo ao rolar; o seletor de ordem ganhou as ordens por texto (Confronto, Empresa, Evento, Tipo, A–Z e Z–A) e "Assistidas há mais tempo"; no Backlog em cards, o seletor só mostra as ordens que funcionam agrupadas (se estava por Confronto/Tipo, volta pra "Adicionados por último"); no celular do Backlog, o nome do evento aparece embaixo do confronto; editar no Backlog em lista é o ícone ✎.
 - **Revisão · Empresa no Backlog** (pedido do usuário, feito em 17/11/2026). Olhar: botão "Filtros" e painel com Empresa no Backlog, chip do filtro ativo, coluna Empresa na lista, ordens "Empresa (A–Z/Z–A)". Escolhas do Claude: dentro da mesma empresa, evento mais recente primeiro; com busca ou filtro, o contador mostra "N de M itens"; na visão em cards, cada grupo mostra só os itens que batem com a busca (antes mostrava o evento todo — corrigido pra bater com a lista e o contador); no celular, a barra do Backlog ficou em 3 linhas.
+- **Revisão externa (18/11/2026).** Dois agentes (revisão de código e QA funcional) acharam 13 problemas; todos corrigidos e retestados (29 testes de regressão + offline), mais 8 sugestões aprovadas pelo usuário (ver DECISOES › Revisão externa). Olhar: aviso de luta repetida no Backlog, aviso de data anterior ao evento, aviso de equipe maior que o lado, cor de destaque voltando junto ao restaurar backup, nova cor verde-limão na paleta das empresas.
 
 ### Pendências e lembretes pra próximas etapas
 
@@ -55,6 +56,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - ECharts: cores passadas pra ele precisam da sintaxe antiga com vírgulas (`rgba(r, g, b, a)`); a sintaxe nova do CSS vira preto. `coresTema()` já cuida disso.
 - O build ainda avisa que o pedaço dos gráficos (~600 kB) passou de 500 kB, mas ele só carrega sob demanda; o app principal ficou com ~200 kB.
 - O Início ainda abre a edição ao clicar numa luta (decidido na etapa 3); o detalhe em painel está em `src/componentes/detalhe-luta.js`.
+- App instalado: versão nova só assume depois que **todas as janelas do app fecharem** (service worker sem skipWaiting, de propósito).
 - O fluxo de publicação usa actions na versão v4 (avisos de Node 20 descontinuado no GitHub); atualizar quando houver versão nova estável.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 

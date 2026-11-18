@@ -81,10 +81,10 @@ export function distribuicaoNotas(itens) {
   return contagem.map((qtd, k) => ({ nota: k / 4, qtd }));
 }
 
-// Lutas de 4.50 pra cima: maior nota primeiro, depois a assistida por último.
+// Lutas de 4.50 pra cima: maior nota primeiro, depois a assistida por último (visualização mais recente).
 export const destaques = (itens) =>
   itens.filter((i) => i.nota != null && i.nota >= 4.5)
-    .sort((a, b) => b.nota - a.nota || (b.primeiraVisualizacao ?? '').localeCompare(a.primeiraVisualizacao ?? ''));
+    .sort((a, b) => b.nota - a.nota || (b.ultimaVisualizacao ?? '').localeCompare(a.ultimaVisualizacao ?? ''));
 
 // Calendário: [['2026-03-14', 3], ...] só com os dias que tiveram luta no ano.
 export function calendario(itens, ano) {

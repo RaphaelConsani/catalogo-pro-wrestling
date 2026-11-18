@@ -61,6 +61,7 @@ export async function carregarCatalogo() {
         tipo?.nome,
         ...estips.map((e) => e.nome),
         titulo?.nome,
+        ctx.metodos.get(luta.metodoVitoriaId)?.nome,
         luta.observacoes,
       ].join(' '),
     );

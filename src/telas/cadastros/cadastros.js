@@ -172,41 +172,44 @@ async function abrirFormulario(def, reg, ctx, aoSalvar) {
     const valores = Object.fromEntries(Object.entries(campos).map(([k, c]) => [k, c.ler()]));
     const dados = { ...def.montar(valores), ...(reg ? { id: reg.id } : {}) };
 
-    const duplicado = await buscarDuplicado(def.tabela, dados);
-    if (duplicado) {
-      if (def.duplicado === 'bloquear') {
-        mostrarErro(campos.nome, def.mensagemDuplicado ?? `Já existe ${def.novo.startsWith('Nova') ? 'uma' : 'um'} ${def.singular} com esse nome.`);
-        return;
-      }
-      const seguir = await confirmar({
-        titulo: 'Nome repetido',
-        mensagem: `Já existe um ${def.singular} chamado “${duplicado.nome}”. Salvar mesmo assim?`,
-        confirmarTexto: 'Salvar mesmo assim',
-      });
-      if (!seguir) return;
-    }
-
+    // Trava já no começo: com clique duplo, o segundo envio não passa pela checagem de duplicado.
     botao.disabled = true;
+    let novaImagemId = null;
     try {
-      if (campos.imagem) {
-        const img = valores.imagem;
-        if (img.nova) {
-          dados.imagemId = await salvarImagem(img.nova);
-          await apagarImagem(img.imagemId);
-        } else if (img.remover) {
-          dados.imagemId = null;
-          await apagarImagem(img.imagemId);
-        } else {
-          dados.imagemId = img.imagemId ?? null;
+      const duplicado = await buscarDuplicado(def.tabela, dados);
+      if (duplicado) {
+        if (def.duplicado === 'bloquear') {
+          mostrarErro(campos.nome, def.mensagemDuplicado ?? `Já existe ${def.novo.startsWith('Nova') ? 'uma' : 'um'} ${def.singular} com esse nome.`);
+          return;
         }
+        const seguir = await confirmar({
+          titulo: 'Nome repetido',
+          mensagem: `Já existe um ${def.singular} chamado “${duplicado.nome}”. Salvar mesmo assim?`,
+          confirmarTexto: 'Salvar mesmo assim',
+        });
+        if (!seguir) return;
+      }
+
+      // Imagem: grava a nova, salva o registro e só então apaga a antiga.
+      const img = campos.imagem ? valores.imagem : null;
+      if (img) {
+        if (img.nova) dados.imagemId = novaImagemId = await salvarImagem(img.nova);
+        else if (img.remover) dados.imagemId = null;
+        else dados.imagemId = img.imagemId ?? null;
       }
       await salvar(def.tabela, dados);
+      novaImagemId = null;
+      // Registro já salvo: se apagar a antiga falhar, ela só fica sobrando no banco.
+      if (img && (img.nova || img.remover)) await apagarImagem(img.imagemId).catch((erro) => console.error(erro));
       toast(reg ? 'Alterações salvas' : `${def.singular[0].toUpperCase() + def.singular.slice(1)} “${dados.nome}” criad${def.novo.startsWith('Nova') ? 'a' : 'o'}`);
       fecharPainel();
       await aoSalvar();
     } catch (erro) {
       console.error(erro);
       toast('Não foi possível salvar.', 'erro');
+      // Registro não salvou: a imagem nova ficaria órfã.
+      if (novaImagemId) await apagarImagem(novaImagemId).catch(() => {});
+    } finally {
       botao.disabled = false;
     }
   });
