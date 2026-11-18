@@ -12,7 +12,8 @@ export const ACENTOS = [
 const CHAVE = 'corAcento';
 const valido = (id) => ACENTOS.some((a) => a.id === id);
 
-function aplicar(id) {
+export function aplicar(id) {
+  if (!valido(id)) return;
   document.documentElement.dataset.acento = id;
   try {
     localStorage.setItem(CHAVE, id);

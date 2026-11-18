@@ -1,0 +1,12 @@
+# Sincronização entre aparelhos (Mac e iPhone) do Catálogo de Pro Wrestling.
+# Publicar: cd sync && npx wrangler@4.156.0 deploy
+# Banco: npx wrangler@4.156.0 d1 migrations apply catalogo-sync --remote
+name = "catalogo-sync"
+main = "src/index.js"
+compatibility_date = "2026-10-15"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "catalogo-sync"
+database_id = "PREENCHER_DEPOIS_DO_D1_CREATE"
+migrations_dir = "migrations"

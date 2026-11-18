@@ -202,6 +202,78 @@
   }
 }
 
+/* Indicador da sincronização (antes das cores; some com a sincronização desligada) */
+.indicador-sync {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--texto-suave);
+  transition: color 0.15s, background 0.15s;
+}
+
+.indicador-sync[hidden] {
+  display: none;
+}
+
+.indicador-sync:hover {
+  background: var(--superficie-2);
+  color: var(--texto);
+}
+
+.indicador-sync svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Bolinha de situação no canto do ícone */
+.indicador-sync::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--fundo);
+  background: var(--sucesso);
+}
+
+.indicador-sync.sincronizando::after {
+  background: var(--neon);
+  animation: pulsar-sync 1s ease-in-out infinite;
+}
+
+.indicador-sync.offline {
+  color: var(--texto-fraco);
+}
+
+.indicador-sync.offline::after {
+  background: var(--texto-fraco);
+}
+
+.indicador-sync.erro::after {
+  background: #ffb020;
+}
+
+@keyframes pulsar-sync {
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicador-sync.sincronizando::after {
+    animation: none;
+  }
+}
+
+.indicador-sync:not([hidden]) + .acento {
+  margin-left: 4px;
+}
+
 /* Seletor de cor de destaque (canto direito do topo) */
 .acento {
   display: flex;
@@ -233,4 +305,22 @@
   opacity: 1;
   border-color: var(--fundo);
   box-shadow: 0 0 0 2px var(--cor), 0 0 12px var(--cor);
+}
+
+/* Celular: com o indicador da sincronização no topo, o menu (que rola pro lado)
+   ganha um esmaecido na borda direita pra não parecer cortado. */
+@media (max-width: 720px) {
+  .topo {
+    gap: 10px;
+  }
+
+  .indicador-sync {
+    width: 28px;
+    height: 28px;
+  }
+
+  .menu {
+    -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, #000 82%, transparent);
+  }
 }

@@ -1,5 +1,6 @@
 import { situacaoLembrete, dispensarLembrete, exportarBackup } from '../db/backup.js';
 import { toast } from './toast.js';
+import { ehIOS } from '../util/aparelho.js';
 
 // Faixa abaixo do menu quando faz 7 dias ou mais sem backup (ou sem nenhum, contando
 // da 1ª luta). Some ao exportar; o ✕ esconde até o dia seguinte.
@@ -7,7 +8,8 @@ export function montarLembreteBackup(el) {
   async function atualizar() {
     let s = null;
     try {
-      s = await situacaoLembrete();
+      // Com a sincronização, o lembrete fica só no Mac (decisão da fase 2).
+      s = ehIOS() ? null : await situacaoLembrete();
     } catch (erro) {
       console.error('Erro ao conferir o lembrete de backup:', erro);
     }

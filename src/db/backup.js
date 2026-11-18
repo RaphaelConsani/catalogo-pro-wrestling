@@ -1,11 +1,14 @@
 import { db } from './schema.js';
 import { agora } from '../util/ids.js';
+import { lerSync } from './sincronizacao.js';
 
 // Backup completo em JSON, com as imagens embutidas (base64).
 // Vai TUDO, inclusive registros com exclusão lógica (excluidoEm) e itens concluídos
 // do backlog: a fase 2 ("importar e mesclar") vai precisar deles pra saber o que foi apagado.
-// Da tabela config só vai a cor de destaque (corAcento); o resto é do aparelho
-// (data do último backup, lembrete).
+// Da tabela config vão a cor de destaque e os duplicados marcados como "manter os dois";
+// o resto é do aparelho (data do último backup, lembrete, sincronização).
+// Com a sincronização ligada, a chave também vai (campo sincronizacao): recupera o acesso
+// se os aparelhos se perderem. Ela não é restaurada sozinha; a tela Dados lê do arquivo.
 
 export const APP = 'catalogo-pro-wrestling';
 export const FORMATO = 1;
@@ -33,21 +36,23 @@ function base64ParaBlob(base64, tipo) {
   return new Blob([bytes], { type: tipo });
 }
 
-const CONFIG_NO_BACKUP = ['corAcento'];
+const CONFIG_NO_BACKUP = ['corAcento', 'duplicadosIgnorados'];
+const limpo = ({ _pendente, _remoto, ...resto }) => resto;
 
 export async function montarBackup() {
   const tabelas = {};
   await db.transaction('r', [...TABELAS, 'imagens', 'config'], async () => {
-    for (const t of TABELAS) tabelas[t] = await db.table(t).toArray();
-    tabelas.imagens = await db.imagens.toArray();
-    tabelas.config = (await db.config.bulkGet(CONFIG_NO_BACKUP)).filter(Boolean);
+    for (const t of TABELAS) tabelas[t] = (await db.table(t).toArray()).map(limpo);
+    tabelas.imagens = (await db.imagens.toArray()).map(limpo);
+    tabelas.config = (await db.config.bulkGet(CONFIG_NO_BACKUP)).filter(Boolean).map(limpo);
   });
   const imagens = [];
   for (const { blob, ...resto } of tabelas.imagens) {
     imagens.push({ ...resto, mimeType: resto.mimeType || blob.type, dados: await blobParaBase64(blob) });
   }
   tabelas.imagens = imagens;
-  return { app: APP, formato: FORMATO, versaoBanco: db.verno, exportadoEm: agora(), tabelas };
+  const sync = await lerSync();
+  return { app: APP, formato: FORMATO, versaoBanco: db.verno, exportadoEm: agora(), tabelas, ...(sync?.chave ? { sincronizacao: { chave: sync.chave } } : {}) };
 }
 
 export const hojeISO = () => {
@@ -78,6 +83,20 @@ export async function exportarBackup() {
 // ---------- Importar ----------
 
 export class BackupInvalido extends Error {}
+
+// Só a chave da sincronização guardada num backup (pra ligar a sincronização num aparelho novo).
+export async function lerChaveDoBackup(arquivo) {
+  let dados;
+  try {
+    dados = JSON.parse(await arquivo.text());
+  } catch {
+    throw new BackupInvalido('O arquivo não é um JSON válido.');
+  }
+  if (dados?.app !== APP) throw new BackupInvalido('Esse arquivo não é um backup do Catálogo de Pro Wrestling.');
+  const chave = dados.sincronizacao?.chave;
+  if (!chave) throw new BackupInvalido('Esse backup foi feito sem a sincronização ligada: não tem chave.');
+  return chave;
+}
 
 // Lê e confere o arquivo; devolve o backup e um resumo pro diálogo de confirmação.
 export async function lerBackup(arquivo) {

@@ -41,6 +41,8 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] **Rodada final de revisão do usuário** · tudo aprovado em 18/11/2026 (as escolhas do Claude que estavam na lista foram pro DECISOES.md › Escolhas do Claude aprovadas)
 - [x] **Importar evento do Cagematch** (pedido do usuário, 18/11/2026; decisões em DECISOES.md). Feito: função no Cloudflare Workers em `worker/` (publicada em https://catalogo-cagematch.raphaelconsani.workers.dev/evento?url=… ; publicar de novo com `cd worker && npx wrangler@4.156.0 deploy`, o usuário já fez login no Wrangler). No app: leitor em `src/util/cagematch.js`, plano/gravação em `src/db/cagematch.js`, painel em `src/componentes/importar-cagematch.js`, botão "Do Cagematch" no Backlog; "Assisti" usa os dados escondidos (`item.cagematch`).
 
+- [ ] **Fase 2 · Sincronização Mac ↔ iPhone** (decisões em DECISOES.md › Fase 2). Feito e testado localmente (28 testes com dois aparelhos simulados): função em `sync/` (Cloudflare Workers + D1, migrations em `sync/migrations/`), motor em `src/db/sincronizacao.js` (ganchos do Dexie marcam `_pendente`/`criadoNo`), duplicados em `src/db/duplicados.js`, cartões em `src/componentes/cartoes-sync.js`, ícone em `src/componentes/indicador-sync.js`. Falta: criar o banco D1 e publicar a função na conta do usuário (precisa da confirmação dele), depois instalar no iPhone.
+
 ### Pendências e lembretes pra próximas etapas
 
 - Dourado (`--ouro*` em `tema.css`) é reservado pras lutas 5★ — inclusive nos gráficos (use o neon). Nota usa as cores por faixa (`classeFaixa()`/`faixaNota()` em `src/util/nota.js`, tokens `--nota-0..4`).
@@ -67,5 +69,6 @@ O usuário roda comandos no Terminal; lembre sempre de incluir o `cd` pra pasta 
 - `src/componentes/` — painel lateral, diálogo, toast, campos de formulário, seletor de wrestlers, seletor de cor de destaque
 - `src/estilos/` — `tema.css` (tokens), `base.css`, `layout.css`, `componentes.css`, `cadastros.css`
 - `src/util/` — ids, texto (normalizar, escapar, datas), imagem (redimensionamento)
+- `sync/` — função do Cloudflare Workers + banco D1 da sincronização entre aparelhos (testar local: `cd sync && npx wrangler@4.156.0 dev --port 8788`; o `npm run dev` aponta pra ela)
 - `worker/` — função do Cloudflare Workers que busca a página do evento no Cagematch (resolve o desafio anti-robô; só aceita o app e o localhost)
 - `Prints/` — prints que o usuário manda (fora do git). Leia de lá quando ele citar um print.

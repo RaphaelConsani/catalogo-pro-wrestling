@@ -17,7 +17,9 @@ import './estilos/dados.css';
 import './estilos/lista.css';
 
 import { db } from './db/schema.js';
-import { definirRota, iniciarRouter } from './router.js';
+// Antes de tudo: instala os ganchos que marcam o que mudou neste aparelho (sincronização).
+import { iniciarSincronizacao } from './db/sincronizacao.js';
+import { definirRota, iniciarRouter, redesenharTela, caminhoAtual } from './router.js';
 import { telaNaoEncontrada } from './telas/nao-encontrada.js';
 import { telaInicio } from './telas/inicio.js';
 import { telaNovaLuta, telaEditarLuta } from './telas/luta/formulario.js';
@@ -27,7 +29,8 @@ import { telaDashboards } from './telas/dashboards.js';
 import { telaDados } from './telas/dados.js';
 import { telaBacklog, telaAssistiBacklog, telaRegistrarEventoBacklog } from './telas/backlog.js';
 import { telaCadastros, telaCadastro } from './telas/cadastros/cadastros.js';
-import { montarSeletorAcento } from './componentes/seletor-acento.js';
+import { montarSeletorAcento, aplicar as aplicarCor } from './componentes/seletor-acento.js';
+import { montarIndicadorSync } from './componentes/indicador-sync.js';
 import { montarLembreteBackup } from './componentes/lembrete-backup.js';
 import { toast } from './componentes/toast.js';
 
@@ -69,6 +72,7 @@ function marcarAtivo(caminho) {
 }
 
 montarSeletorAcento(document.getElementById('seletor-acento'));
+montarIndicadorSync(document.getElementById('indicador-sync'));
 // O lembrete de backup é conferido a cada troca de tela (pega lutas recém-registradas).
 const lembrete = montarLembreteBackup(document.getElementById('lembrete-backup'));
 iniciarRouter(document.getElementById('app'), (caminho) => {
@@ -83,8 +87,23 @@ if (aviso) {
   toast(aviso);
 }
 
-// Abre o banco (cria e grava os dados iniciais na primeira vez).
-db.open().catch((erro) => console.error('Erro ao abrir o banco:', erro));
+// Abre o banco (cria e grava os dados iniciais na primeira vez) e liga a sincronização.
+db.open()
+  .then(() => iniciarSincronizacao())
+  .catch((erro) => console.error('Erro ao abrir o banco:', erro));
+
+// Chegaram dados de outro aparelho: redesenha a tela atual, menos formulários
+// (perderia o que está sendo digitado) e com painel ou diálogo abertos.
+const FORMULARIOS = /^\/(nova-luta|luta\/[^/]+\/editar|backlog\/[^/]+\/(assisti|registrar))/;
+window.addEventListener('dados-sincronizados', (e) => {
+  if (e.detail?.recomecou) {
+    sessionStorage.setItem('avisoPosImportacao', 'Os dados foram substituídos por um backup restaurado em outro aparelho.');
+    return location.reload();
+  }
+  if (FORMULARIOS.test(caminhoAtual()) || document.querySelector('.painel-raiz, dialog[open]')) return;
+  redesenharTela();
+});
+window.addEventListener('cor-sincronizada', (e) => aplicarCor(e.detail));
 
 // App instalável e offline: service worker só na versão publicada (no "npm run dev" atrapalharia).
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
