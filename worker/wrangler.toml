@@ -1,0 +1,5 @@
+# Função no Cloudflare Workers que busca a página de um evento no Cagematch pro app.
+# Publicar: cd worker && npx wrangler@4.156.0 deploy
+name = "catalogo-cagematch"
+main = "src/index.js"
+compatibility_date = "2026-10-15"

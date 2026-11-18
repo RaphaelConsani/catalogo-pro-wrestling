@@ -39,6 +39,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - [x] Etapa 8 · Publicação (instalado no Brave do usuário em 17/11/2026). Repositório público `RaphaelConsani/catalogo-pro-wrestling`; app em https://raphaelconsani.github.io/catalogo-pro-wrestling/ . Cada push no `main` publica sozinho (`.github/workflows/publicar.yml`). App instalável e offline: `public/manifest.webmanifest`, ícones em `public/icones/`, service worker gerado no build a partir de `src/sw-modelo.js` (plugin em `vite.config.js`). Push está autorizado pelo usuário (17/11/2026).
 - [x] Etapa 9 · Importação da planilha (importado no app do usuário em 17/11/2026; regras em DECISOES.md; script de conversão ficou fora do repositório)
 - [ ] **Rodada final de revisão do usuário** (lista abaixo)
+- [ ] **Importar evento do Cagematch** (pedido do usuário, 18/11/2026; decisões em DECISOES.md). Feito: função no Cloudflare Workers em `worker/` (publicada em https://catalogo-cagematch.raphaelconsani.workers.dev/evento?url=… ; publicar de novo com `cd worker && npx wrangler@4.156.0 deploy`, o usuário já fez login no Wrangler). Falta: leitura das lutas no app, tela de revisão e gravação no Backlog.
 
 ### Pra revisão final (usuário)
 
@@ -77,4 +78,5 @@ O usuário roda comandos no Terminal; lembre sempre de incluir o `cd` pra pasta 
 - `src/componentes/` — painel lateral, diálogo, toast, campos de formulário, seletor de wrestlers, seletor de cor de destaque
 - `src/estilos/` — `tema.css` (tokens), `base.css`, `layout.css`, `componentes.css`, `cadastros.css`
 - `src/util/` — ids, texto (normalizar, escapar, datas), imagem (redimensionamento)
+- `worker/` — função do Cloudflare Workers que busca a página do evento no Cagematch (resolve o desafio anti-robô; só aceita o app e o localhost)
 - `Prints/` — prints que o usuário manda (fora do git). Leia de lá quando ele citar um print.

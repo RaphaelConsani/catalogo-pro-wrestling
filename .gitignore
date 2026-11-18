@@ -33,3 +33,7 @@ catalogo-*.json
 
 # Prints de tela (podem conter dados pessoais)
 Prints/
+
+# Cloudflare Workers (arquivos locais do wrangler)
+.wrangler/
+worker/.dev.vars

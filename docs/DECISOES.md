@@ -159,3 +159,15 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - A cor da faixa vai no **número da nota**, nas **estrelinhas** e nas **barras do gráfico de distribuição** dos Dashboards. Médias (Dashboards, wrestler, ranking) usam a faixa da média (ex.: 4.83 → faixa 4).
 - Continua igual: seção de destaques lista 4.50+ (título dourado); borda girando, selo, fundo dourado da linha e contagem de 5★ só pro 5★.
 - Detalhes do Claude: no ranking, a barra fica dourada só com média 5.00 (as outras seguem no neon); no Início, a borda dourada da linha passou a valer só pro 5.00.
+
+## Importar evento do Cagematch (18/11/2026)
+
+- Entrada: **colar o link do evento** no app. O app chama uma função no **Cloudflare Workers** (pasta `worker/`), que busca a página, resolve o desafio anti-robô do Cagematch (Sucuri) e devolve o HTML; a leitura das lutas é feita no app. O app continua no GitHub Pages. Contornar o desafio foi autorizado pelo usuário.
+- Worker: só aceita páginas de evento (`id=1`) do cagematch.net, só responde ao endereço do app e ao localhost, guarda a página em cache por 1 hora.
+- Lutas importadas vão pro **Backlog** (um item de luta por match).
+- Wrestler que não existe é **criado na hora**, com a **empresa do evento**; o **número do Cagematch** fica guardado no wrestler pra reconhecer nas próximas importações.
+- Equipes: **liga à equipe existente pelo nome ou cria** com os membros da luta. Lado com mais de uma equipe junta fica só com os wrestlers.
+- Tipo de match deduzido pela **quantidade de lados e de wrestlers**; quando não encaixar, o usuário escolhe na revisão.
+- Títulos e estipulações: reconhecidos pelo nome; o que não for reconhecido o usuário **escolhe ou cria na tela de revisão**.
+- Evento criado se não existir (nome, data, empresa); empresa reconhecida pelo nome completo ou sigla.
+- Vencedor, duração e título ficam **guardados escondidos** no item do Backlog (sem spoiler) e só preenchem o formulário no "Assisti". Método de vitória fica em branco (o Cagematch não mostra).
