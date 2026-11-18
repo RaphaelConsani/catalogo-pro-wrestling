@@ -1,7 +1,7 @@
 import { abrirPainel } from './painel.js';
 import { htmlEstrelas } from './nota.js';
 import { esc, formatarData } from '../util/texto.js';
-import { formatarNota } from '../util/nota.js';
+import { formatarNota, classeFaixa } from '../util/nota.js';
 import { segundosParaDuracao } from '../util/duracao.js';
 import { NOME_RESULTADO } from '../db/catalogo.js';
 
@@ -9,7 +9,6 @@ import { NOME_RESULTADO } from '../db/catalogo.js';
 // item: entrada de carregarCatalogo().itens · ctx: mapas do catálogo
 export function abrirDetalheLuta(item, ctx) {
   const { luta, evento, empresa, nota, visualizacoes } = item;
-  const alta = nota != null && nota >= 4.5;
 
   const lados = luta.lados
     .map((l, i) => {
@@ -47,7 +46,7 @@ export function abrirDetalheLuta(item, ctx) {
       return `<li class="${recente ? 'recente' : ''}">
         <span class="hist-ordem">${i + 1}ª</span>
         <span class="hist-data">${formatarData(v.data)}</span>
-        <span class="hist-nota${v.nota >= 4.5 ? ' alta' : ''}">${htmlEstrelas(v.nota, `estrelas-pequenas${v.nota >= 4.5 ? ' cinco' : ''}`)}<strong>${esc(formatarNota(v.nota))}</strong></span>
+        <span class="hist-nota${classeFaixa(v.nota)}">${htmlEstrelas(v.nota, 'estrelas-pequenas')}<strong>${esc(formatarNota(v.nota))}</strong></span>
         <span class="hist-plataforma">${esc(plat?.nome ?? '—')}</span>
       </li>`;
     })
@@ -57,8 +56,8 @@ export function abrirDetalheLuta(item, ctx) {
   conteudo.className = `detalhe-luta${nota === 5 ? ' cinco-estrelas' : ''}`;
   conteudo.style.setProperty('--cor-empresa', empresa?.cor ?? '#3a4152');
   conteudo.innerHTML = `
-    <div class="detalhe-nota${alta ? ' alta' : ''}">
-      ${htmlEstrelas(nota, alta ? 'cinco' : '')}
+    <div class="detalhe-nota${classeFaixa(nota)}">
+      ${htmlEstrelas(nota)}
       <strong>${esc(formatarNota(nota))}</strong>
       <small>nota mais recente</small>
     </div>

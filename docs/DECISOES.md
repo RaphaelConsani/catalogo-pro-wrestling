@@ -12,7 +12,7 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 
 ## Visual
 
-- Só tema escuro. Neon na interface; **dourado reservado** pras lutas 5★ e acima de 4½.
+- Só tema escuro. Neon na interface; **dourado reservado** pras lutas 5★ (até 18/11/2026 valia também de 4½ pra cima; ver "Cores por faixa de nota").
 - Cor de destaque escolhida pelo usuário na barra superior (3 bolinhas): ciano `#22e6ff` (padrão), roxo `#a855ff`, vermelho `#ff3b5c`. No vermelho, a cor de perigo vira laranja `#ff8a3d`.
 - A cor escolhida fica na tabela `config` (chave `corAcento`, vai no backup), com cópia em localStorage só pra não piscar ao carregar.
 - Menu na barra superior; "Nova luta" em destaque como botão.
@@ -61,7 +61,7 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 ## Etapa 4 · Biblioteca e página do wrestler
 
 - Card da luta: **só texto, tipográfico** (sem imagens), na cor da empresa.
-- Destaque 5 estrelas: **borda dourada com brilho** que passa devagar + selo "★ 5 STARS". De 4½ pra cima, a nota fica dourada.
+- Destaque 5 estrelas: **borda dourada com brilho** que passa devagar + selo "★ 5 STARS". ~~De 4½ pra cima, a nota fica dourada.~~ Substituído pelas cores por faixa de nota (18/11/2026).
 - Filtros: empresa, wrestler, tipo, estipulação, ano do evento, faixa de nota + evento, título em disputa, resultado, plataforma e "assisti mais de uma vez". A busca por texto sempre existe.
 - Filtro de empresa considera **principal + parceiras** (os dashboards continuam usando só a principal).
 - Ordenação padrão: **assistidas por último** (visualização mais recente); dá pra trocar.
@@ -151,3 +151,11 @@ Registro das decisões combinadas com o usuário, pra não perguntar de novo. Ac
 - Destaques 4.50+: desempate entre notas iguais pela **visualização mais recente**.
 - Excel: nota 0 sai como **DUD** (texto).
 - App atualizado: a versão nova só assume quando todas as janelas do app fecharem (evita falha nos gráficos/Excel com o app aberto).
+
+## Cores por faixa de nota (18/11/2026)
+
+- A nota ganha **cor por faixa**, fixa (não muda com a cor de destaque), paleta "frio → quente": 0–0.75 cinza `#8b93a7` · 1–1.75 vermelho `#f87171` · 2–2.75 rosa `#f472b6` · 3–3.75 roxo `#a78bfa` · 4–4.75 azul-ciano `#38bdf8` · **5.00 dourado**.
+- **Brilho dourado só no 5.00**, em todo o app. De 4.50 a 4.75 a nota deixa de ser dourada (fica na faixa 4).
+- A cor da faixa vai no **número da nota**, nas **estrelinhas** e nas **barras do gráfico de distribuição** dos Dashboards. Médias (Dashboards, wrestler, ranking) usam a faixa da média (ex.: 4.83 → faixa 4).
+- Continua igual: seção de destaques lista 4.50+ (título dourado); borda girando, selo, fundo dourado da linha e contagem de 5★ só pro 5★.
+- Detalhes do Claude: no ranking, a barra fica dourada só com média 5.00 (as outras seguem no neon); no Início, a borda dourada da linha passou a valer só pro 5.00.

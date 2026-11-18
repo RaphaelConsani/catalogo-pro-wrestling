@@ -1,4 +1,4 @@
-import { formatarNota, NOTA_MAX, PASSO } from '../util/nota.js';
+import { formatarNota, classeFaixa, NOTA_MAX, PASSO } from '../util/nota.js';
 
 // Estrelas com preenchimento parcial (quartos). Serve pra exibição em qualquer tela.
 export function htmlEstrelas(n, classe = '') {
@@ -22,14 +22,14 @@ export function criarCampoNota({ valor = null, aoMudar } = {}) {
       return `<button type="button" class="estrela" data-valor="${i + 1}" style="--preenchido:${preenchido}%"
         aria-label="${i + 1} estrela${i ? 's' : ''}">★</button>`;
     }).join('');
-    const cinco = nota === NOTA_MAX;
+    el.className = `nota-campo${classeFaixa(nota)}`;
     el.innerHTML = `
-      <span class="estrelas estrelas-campo${cinco ? ' cinco' : ''}">${estrelas}</span>
+      <span class="estrelas estrelas-campo">${estrelas}</span>
       <span class="nota-ajuste">
         <button type="button" class="botao-icone nota-menos" aria-label="Diminuir ¼" ${nota == null || nota <= 0 ? 'disabled' : ''}>−¼</button>
         <button type="button" class="botao-icone nota-mais" aria-label="Aumentar ¼" ${nota != null && nota >= NOTA_MAX ? 'disabled' : ''}>+¼</button>
       </span>
-      <span class="nota-texto${nota == null ? ' vazia' : ''}${nota >= 4.5 ? ' alta' : ''}">
+      <span class="nota-texto${nota == null ? ' vazia' : ''}">
         ${nota == null ? 'Sem nota' : `<strong>${formatarNota(nota)}</strong>`}
       </span>`;
   }

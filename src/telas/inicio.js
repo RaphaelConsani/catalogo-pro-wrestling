@@ -2,7 +2,7 @@ import { ativos } from '../db/repo.js';
 import { ultimasLutas, confronto } from '../db/lutas.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { esc, formatarData } from '../util/texto.js';
-import { formatarNota } from '../util/nota.js';
+import { formatarNota, classeFaixa } from '../util/nota.js';
 
 const RESULTADO = { draw: 'Draw', time_limit_draw: 'Time Limit Draw', no_contest: 'No Contest' };
 
@@ -44,8 +44,8 @@ export async function telaInicio(container) {
         luta.resultado === 'vitoria'
           ? `Vence: ${(luta.lados[luta.ladoVencedor] && confronto({ lados: [luta.lados[luta.ladoVencedor]] }, ctx)) || '?'}`
           : RESULTADO[luta.resultado];
-      return `<a class="luta-linha${nota >= 4.5 ? ' destaque' : ''}" href="#/luta/${luta.id}/editar" style="--cor-empresa:${esc(emp?.cor ?? 'var(--borda-forte)')}">
-        <span class="luta-linha-nota">
+      return `<a class="luta-linha${nota === 5 ? ' destaque' : ''}" href="#/luta/${luta.id}/editar" style="--cor-empresa:${esc(emp?.cor ?? 'var(--borda-forte)')}">
+        <span class="luta-linha-nota${classeFaixa(nota)}">
           ${htmlEstrelas(nota, 'estrelas-pequenas')}
           <strong>${esc(formatarNota(nota))}</strong>
         </span>

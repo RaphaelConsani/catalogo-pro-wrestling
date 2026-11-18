@@ -21,6 +21,8 @@ export function coresTema() {
     neon: `rgb(${rgb})`,
     neonFraco: `rgba(${rgb}, 0.25)`,
     ouro: v('--ouro'),
+    // Cores das faixas de nota (0 a 4) e o dourado do 5.00, na ordem de faixaNota().
+    faixas: [0, 1, 2, 3, 4].map((f) => v(`--nota-${f}`)).concat(v('--ouro')),
     texto: v('--texto'),
     textoSuave: v('--texto-suave'),
     textoFraco: v('--texto-fraco'),

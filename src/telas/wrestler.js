@@ -7,6 +7,7 @@ import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { ORDENACOES, ordenar } from './biblioteca.js';
 import { esc, iniciais, plural } from '../util/texto.js';
+import { classeFaixa } from '../util/nota.js';
 
 const media = (ns) => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : null);
 const fmt2 = (n) => n.toFixed(2);
@@ -46,9 +47,9 @@ export async function telaWrestler(container, { id }) {
 
     <section class="numeros">
       <div class="numero"><strong>${lutas.length}</strong><span>${lutas.length === 1 ? 'luta assistida' : 'lutas assistidas'}</span></div>
-      <div class="numero${nMedia >= 4.5 ? ' alta' : ''}">
+      <div class="numero${classeFaixa(nMedia)}">
         <strong>${nMedia == null ? '—' : fmt2(nMedia)}</strong>
-        <span>${nMedia == null ? 'nota média' : htmlEstrelas(nMedia, `estrelas-pequenas${nMedia >= 4.5 ? ' cinco' : ''}`) + ' nota média'}</span>
+        <span>${nMedia == null ? 'nota média' : htmlEstrelas(nMedia, 'estrelas-pequenas') + ' nota média'}</span>
       </div>
       <div class="numero"><strong>${recorde.vitoria}<small>V</small> ${recorde.derrota}<small>D</small> ${recorde.empate}<small>E</small></strong>
         <span>recorde${recorde.no_contest ? ` · ${plural(recorde.no_contest, 'No Contest', 'No Contests')}` : ''}</span></div>

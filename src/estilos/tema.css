@@ -25,6 +25,13 @@
   --ouro-gradiente: linear-gradient(135deg, #ffe08a 0%, #f5c542 40%, #b8860b 100%);
   --ouro-brilho: 0 0 14px rgb(245 197 66 / 0.5), 0 0 40px rgb(245 197 66 / 0.18);
 
+  /* Faixas de nota (fixas, não mudam com a cor de destaque). 5.00 usa o dourado. */
+  --nota-0: #8b93a7; /* 0–0.75 */
+  --nota-1: #f87171; /* 1–1.75 */
+  --nota-2: #f472b6; /* 2–2.75 */
+  --nota-3: #a78bfa; /* 3–3.75 */
+  --nota-4: #38bdf8; /* 4–4.75 */
+
   --perigo: #ff4d6d;
   --sucesso: #39d98a;
 

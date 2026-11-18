@@ -182,8 +182,11 @@
   font-family: inherit;
 }
 
-.linha-luta.nota-alta .col-nota {
-  color: var(--ouro);
+.linha-luta.faixa .col-nota {
+  color: var(--cor-nota);
+}
+
+.linha-luta.faixa-5 .col-nota {
   text-shadow: var(--ouro-brilho);
 }
 

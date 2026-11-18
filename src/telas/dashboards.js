@@ -10,7 +10,7 @@ import { ordenar } from './biblioteca.js';
 import { abrirDetalheLuta } from '../componentes/detalhe-luta.js';
 import { htmlEstrelas } from '../componentes/nota.js';
 import { esc, plural, formatarData } from '../util/texto.js';
-import { formatarNota, formatarNumeroNota } from '../util/nota.js';
+import { formatarNota, formatarNumeroNota, classeFaixa, faixaNota } from '../util/nota.js';
 
 const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 const RANKING_INICIAL = 25;
@@ -87,9 +87,9 @@ export async function telaDashboards(container) {
     elConteudo.innerHTML = `
       <section class="numeros">
         <div class="numero"><strong>${lista.length}</strong><span>${lista.length === 1 ? 'luta assistida' : 'lutas assistidas'}</span></div>
-        <div class="numero${media >= 4.5 ? ' alta' : ''}"><strong>${fmtMedia(media)}</strong>
-          <span>${media == null ? '' : htmlEstrelas(media, `estrelas-pequenas${media >= 4.5 ? ' cinco' : ''}`)} nota média</span></div>
-        <div class="numero${cincos ? ' alta' : ''}"><strong>${cincos}</strong><span>${cincos === 1 ? 'luta 5 estrelas' : 'lutas 5 estrelas'}</span></div>
+        <div class="numero${classeFaixa(media)}"><strong>${fmtMedia(media)}</strong>
+          <span>${media == null ? '' : htmlEstrelas(media, 'estrelas-pequenas')} nota média</span></div>
+        <div class="numero${cincos ? ' faixa faixa-5' : ''}"><strong>${cincos}</strong><span>${cincos === 1 ? 'luta 5 estrelas' : 'lutas 5 estrelas'}</span></div>
         <div class="numero"><strong>${qtdWrestlers}</strong><span>wrestlers diferentes</span></div>
       </section>
 
@@ -168,7 +168,7 @@ export async function telaDashboards(container) {
     });
   }
 
-  // Barras de 4.50 pra cima em dourado (são as lutas de destaque).
+  // Cada barra na cor da faixa da nota; 5.00 em dourado.
   function desenharDistribuicao(lista, c) {
     const dados = distribuicaoNotas(lista);
     const base = g.baseGrafico(c);
@@ -179,7 +179,7 @@ export async function telaDashboards(container) {
       yAxis: g.eixoValores(c, { minInterval: 1 }),
       series: [{
         type: 'bar', name: 'Lutas', barCategoryGap: '20%',
-        data: dados.map((d) => ({ value: d.qtd, itemStyle: { color: d.nota >= 4.5 ? c.ouro : c.neon, borderRadius: [3, 3, 0, 0] } })),
+        data: dados.map((d) => ({ value: d.qtd, itemStyle: { color: c.faixas[faixaNota(d.nota)], borderRadius: [3, 3, 0, 0] } })),
       }],
     });
   }
@@ -253,8 +253,7 @@ export async function telaDashboards(container) {
     const linhaRanking = (w, k) => {
       const wr = ctx.wrestlers.get(w.id);
       const emp = ctx.empresas.get(wr?.empresaId);
-      const alta = w.media >= 4.5;
-      return `<li class="ranking-linha${alta ? ' alta' : ''}">
+      return `<li class="ranking-linha${classeFaixa(w.media)}">
         <span class="ranking-posicao">${k + 1}</span>
         <a class="ranking-nome" href="#/wrestler/${w.id}">${esc(wr?.nome ?? '?')}${emp ? `<small>${esc(emp.sigla || emp.nome)}</small>` : ''}</a>
         <span class="ranking-barra"><span style="width:${(w.media / 5) * 100}%"></span></span>

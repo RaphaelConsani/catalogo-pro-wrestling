@@ -197,12 +197,15 @@
   text-align: right;
 }
 
-.ranking-linha.alta .ranking-nota {
-  color: var(--ouro);
+.ranking-linha.faixa .ranking-nota {
+  color: var(--cor-nota);
+}
+
+.ranking-linha.faixa-5 .ranking-nota {
   text-shadow: var(--ouro-brilho);
 }
 
-.ranking-linha.alta .ranking-barra > span {
+.ranking-linha.faixa-5 .ranking-barra > span {
   background: var(--ouro-gradiente);
   box-shadow: var(--ouro-brilho);
 }

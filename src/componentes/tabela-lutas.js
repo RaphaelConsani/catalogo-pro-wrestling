@@ -1,5 +1,5 @@
 import { esc, formatarData } from '../util/texto.js';
-import { formatarNota } from '../util/nota.js';
+import { formatarNota, classeFaixa } from '../util/nota.js';
 import { htmlCabecalho } from './visao.js';
 
 // Visão em lista (tabela compacta) das lutas: Biblioteca, página do wrestler e destaques.
@@ -16,9 +16,8 @@ export const COLUNAS_LUTAS = [
 
 export function htmlLinhaLuta(item) {
   const { luta, evento, empresa, nota } = item;
-  const alta = nota != null && nota >= 4.5;
   const cinco = nota === 5;
-  return `<tr class="linha-luta${alta ? ' nota-alta' : ''}${cinco ? ' cinco-estrelas' : ''}" data-luta="${luta.id}" tabindex="0"
+  return `<tr class="linha-luta${classeFaixa(nota)}${cinco ? ' cinco-estrelas' : ''}" data-luta="${luta.id}" tabindex="0"
       style="--cor-empresa:${esc(empresa?.cor ?? '#3a4152')}">
     <td class="col-nota">${nota == null ? '—' : esc(formatarNota(nota))}</td>
     <td class="col-confronto">${esc(item.confronto)}</td>

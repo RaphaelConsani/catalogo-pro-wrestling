@@ -190,8 +190,11 @@
   color: var(--neon);
 }
 
-.card-luta.nota-alta .card-luta-nota strong {
-  color: var(--ouro);
+.card-luta-nota.faixa strong {
+  color: var(--cor-nota);
+}
+
+.card-luta-nota.faixa-5 strong {
   text-shadow: var(--ouro-brilho);
 }
 
@@ -271,8 +274,11 @@
   color: var(--texto-fraco);
 }
 
-.detalhe-nota.alta strong {
-  color: var(--ouro);
+.detalhe-nota.faixa strong {
+  color: var(--cor-nota);
+}
+
+.detalhe-nota.faixa-5 strong {
   text-shadow: var(--ouro-brilho);
 }
 
@@ -434,8 +440,12 @@
   font-size: 17px;
 }
 
-.hist-nota.alta strong {
-  color: var(--ouro);
+.hist-nota.faixa strong {
+  color: var(--cor-nota);
+}
+
+.hist-nota.faixa-5 strong {
+  text-shadow: var(--ouro-brilho);
 }
 
 .hist-plataforma {
@@ -523,8 +533,11 @@
   text-transform: uppercase;
 }
 
-.numero.alta strong {
-  color: var(--ouro);
+.numero.faixa strong {
+  color: var(--cor-nota);
+}
+
+.numero.faixa-5 strong {
   text-shadow: var(--ouro-brilho);
 }
 

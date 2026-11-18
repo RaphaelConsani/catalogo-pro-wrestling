@@ -20,11 +20,17 @@
   font-size: 15px;
 }
 
-/* 4½ ou mais: dourado */
-.estrelas.cinco .estrela,
-.destaque .estrela,
-.nota-texto.alta ~ .estrela {
-  --cheia: var(--ouro);
+/* Cor por faixa de nota: quem tem .faixa-N define --cor-nota pros números e estrelas de dentro.
+   Só a faixa 5 (5.00) é dourada e tem brilho. */
+.faixa-0 { --cor-nota: var(--nota-0); }
+.faixa-1 { --cor-nota: var(--nota-1); }
+.faixa-2 { --cor-nota: var(--nota-2); }
+.faixa-3 { --cor-nota: var(--nota-3); }
+.faixa-4 { --cor-nota: var(--nota-4); }
+.faixa-5 { --cor-nota: var(--ouro); }
+
+.faixa .estrela {
+  --cheia: var(--cor-nota);
 }
 
 .nota-campo {
@@ -88,13 +94,12 @@
   font-size: 14px;
 }
 
-.nota-texto.alta strong {
-  color: var(--ouro);
-  text-shadow: var(--ouro-brilho);
+.nota-campo.faixa .nota-texto strong {
+  color: var(--cor-nota);
 }
 
-.nota-campo:has(.nota-texto.alta) .estrela {
-  --cheia: var(--ouro);
+.nota-campo.faixa-5 .nota-texto strong {
+  text-shadow: var(--ouro-brilho);
 }
 
 /* ---------- Formulário da luta ---------- */
@@ -447,8 +452,12 @@ textarea.campo-entrada {
   color: var(--neon);
 }
 
-.luta-linha.destaque .luta-linha-nota strong {
-  color: var(--ouro);
+.luta-linha-nota.faixa strong {
+  color: var(--cor-nota);
+}
+
+.luta-linha-nota.faixa-5 strong {
+  text-shadow: var(--ouro-brilho);
 }
 
 .luta-linha-corpo {
