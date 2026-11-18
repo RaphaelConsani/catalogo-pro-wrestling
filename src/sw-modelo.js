@@ -4,6 +4,8 @@
 //   uma janela aberta ainda pode carregar gráficos/Excel da versão antiga, cujo cache
 //   só é apagado quando a nova assume.
 // - Página (index.html): tenta a rede primeiro (pega a versão nova), cai no cache sem internet.
+//   Pede sempre a versão do servidor (cache: 'no-cache'): o GitHub Pages manda guardar a página
+//   por 10 min, e sem isso o app reaberto logo depois de publicar ainda abria a versão antiga.
 // - Demais arquivos têm hash no nome e nunca mudam: cache primeiro.
 // Os dados do usuário ficam no IndexedDB e não passam por aqui.
 
@@ -28,7 +30,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then((resp) => {
           // Só guarda página que veio certa: um 404/500 não pode virar a cópia offline.
           if (resp.ok) {

@@ -51,7 +51,7 @@ App web pessoal pra catalogar lutas de pro wrestling assistidas e o backlog. O e
 - ECharts: cores passadas pra ele precisam da sintaxe antiga com vírgulas (`rgba(r, g, b, a)`); a sintaxe nova do CSS vira preto. `coresTema()` já cuida disso.
 - O build ainda avisa que o pedaço dos gráficos (~600 kB) passou de 500 kB, mas ele só carrega sob demanda; o app principal ficou com ~200 kB.
 - O Início ainda abre a edição ao clicar numa luta (decidido na etapa 3); o detalhe em painel está em `src/componentes/detalhe-luta.js`.
-- App instalado: versão nova só assume depois que **todas as janelas do app fecharem** (service worker sem skipWaiting, de propósito).
+- App instalado: versão nova só assume depois que **todas as janelas do app fecharem** (service worker sem skipWaiting, de propósito). O GitHub Pages manda guardar a página por 10 min (`max-age=600`); desde 18/11/2026 o service worker pede a página com `cache: 'no-cache'` pra não abrir versão antiga logo depois de publicar.
 - O fluxo de publicação usa actions na versão v4 (avisos de Node 20 descontinuado no GitHub); atualizar quando houver versão nova estável.
 - Ícone da aba (favicon) é fixo em ciano; o usuário ainda não pediu pra acompanhar a cor escolhida.
 
