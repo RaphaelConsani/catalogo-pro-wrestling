@@ -205,3 +205,7 @@ O usuário aprovou tudo o que já vinha usando e pediu que, daqui pra frente, o 
 
 - No celular (até 720px), o menu vira um botão **☰ no topo** que abre a lista com todas as telas. No Mac continua a barra de sempre.
 - Detalhes do Claude: o ☰ fica à esquerda do logo e vira ✕ quando aberto; a lista desce do topo na largura toda, com a tela atual marcada por uma barra lateral e "Nova luta" como botão; fecha ao escolher uma tela, ao tocar fora ou com Esc; o nome "Catálogo Pro Wrestling" volta a aparecer no topo do celular (some só em telas com 360px ou menos); sai o esmaecido do menu que rolava pro lado.
+
+## Textos (18/11/2026)
+
+- Resultado no Início: **"Venceu:"** (não "Vence:"): a luta já aconteceu, "vence" parece previsão.

@@ -42,7 +42,7 @@ export async function telaInicio(container) {
       const nota = visualizacoes.at(-1)?.nota ?? null;
       const resultado =
         luta.resultado === 'vitoria'
-          ? `Vence: ${(luta.lados[luta.ladoVencedor] && confronto({ lados: [luta.lados[luta.ladoVencedor]] }, ctx)) || '?'}`
+          ? `Venceu: ${(luta.lados[luta.ladoVencedor] && confronto({ lados: [luta.lados[luta.ladoVencedor]] }, ctx)) || '?'}`
           : RESULTADO[luta.resultado];
       return `<a class="luta-linha${nota === 5 ? ' destaque' : ''}" href="#/luta/${luta.id}/editar" style="--cor-empresa:${esc(emp?.cor ?? 'var(--borda-forte)')}">
         <span class="luta-linha-nota${classeFaixa(nota)}">
