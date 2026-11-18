@@ -8,5 +8,5 @@ compatibility_date = "2026-10-15"
 [[d1_databases]]
 binding = "DB"
 database_name = "catalogo-sync"
-database_id = "PREENCHER_DEPOIS_DO_D1_CREATE"
+database_id = "333d5bab-f042-40ce-bf29-2497c6374a7e"
 migrations_dir = "migrations"
